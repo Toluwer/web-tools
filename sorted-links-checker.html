@@ -1,0 +1,2422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f6f5f1">
+<title>·</title>
+<style>
+
+  :root {
+    --bg:        #f5f4ef;
+    --bg-grad:   #efece4;
+    --surface:   #ffffff;
+    --surface-2: #faf9f5;
+    --ink:       #161616;
+    --ink-soft:  #4a4a48;
+    --muted:     #86857e;
+    --faint:     #b5b3aa;
+    --line:        #ece9df;
+    --line-soft:   #f3f1e9;
+    --line-strong: #c8c2ad;   
+    --accent:    #161616;
+    --green:     #2f7d4f;
+    --green-soft:#e8f1ea;
+    --green-line:#cfe3d3;
+    --red:       #b3403a;
+    --radius:    12px;
+    --radius-sm: 10px;
+    --shadow:    0 1px 2px rgba(20, 18, 12, 0.04),
+                 0 12px 36px rgba(20, 18, 12, 0.06);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    background: var(--bg);
+    background-image:
+      radial-gradient(1200px 600px at 50% -10%, var(--bg-grad), transparent 70%);
+    color: var(--ink);
+    font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
+                 "Helvetica Neue", Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 28px 20px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 520px;
+    background: var(--surface);
+    border: 1.5px solid var(--line-strong);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: visible;            
+    position: relative;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .live-header {
+    padding: 22px 24px 18px;
+    border-bottom: 1px solid var(--line-soft);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: opacity .45s ease, max-height .45s ease, padding .45s ease, border-color .45s ease;
+    max-height: 200px;
+    overflow: hidden;
+  }
+  .live-header.done {
+    opacity: 0;
+    max-height: 0;
+    padding-top: 0; padding-bottom: 0;
+    border-color: transparent;
+    pointer-events: none;
+  }
+
+  .live-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .live-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 11px;
+    font-size: 14px;
+    color: var(--ink-soft);
+    letter-spacing: -0.005em;
+  }
+
+  .dots {
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+    height: 14px;
+  }
+  .dots span {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--ink);
+    opacity: 0.2;
+    animation: dotPulse 1.4s infinite ease-in-out;
+  }
+  .dots span:nth-child(2) { animation-delay: 0.2s; }
+  .dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes dotPulse {
+    0%, 70%, 100% { opacity: 0.2; transform: translateY(0); }
+    35% { opacity: 1; transform: translateY(-2px); }
+  }
+  .live-header.done .dots span { animation: none; }
+
+  .live-count {
+    font-size: 12.5px;
+    color: var(--faint);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+  .live-count b { color: var(--ink-soft); font-weight: 600; }
+
+  .live-track {
+    height: 2px;
+    background: var(--line-soft);
+    border-radius: 999px;
+    overflow: hidden;
+    position: relative;
+  }
+  .live-bar {
+    height: 100%;
+    width: 0%;
+    background: var(--ink);
+    border-radius: 999px;
+    transition: width .35s cubic-bezier(.4,0,.2,1);
+  }
+
+  .list {
+    flex: 1;
+    padding: 6px 8px;
+    overflow-y: auto;
+    max-height: 60vh;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) transparent;
+  }
+  .list::-webkit-scrollbar { width: 6px; }
+  .list::-webkit-scrollbar-track { background: transparent; }
+  .list::-webkit-scrollbar-thumb { background: var(--line); border-radius: 999px; }
+
+  .item {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 11px 14px;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    color: inherit;
+    transition: background .14s ease;
+    animation: itemIn .42s cubic-bezier(.21,.8,.35,1) both;
+  }
+  .item:hover { background: var(--surface-2); }
+  .item:active { background: var(--line-soft); }
+  @keyframes itemIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .check {
+    flex-shrink: 0;
+    width: 19px; height: 19px;
+    border-radius: 50%;
+    background: var(--green-soft);
+    color: var(--green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--green-line);
+  }
+  .check svg { width: 10px; height: 10px; stroke-width: 3; }
+
+  .host {
+    flex: 1;
+    min-width: 0;
+    font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas,
+                 "Liberation Mono", monospace;
+    font-size: 13.5px;
+    color: var(--ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    letter-spacing: -0.005em;
+  }
+
+  .arrow {
+    flex-shrink: 0;
+    color: var(--faint);
+    transition: color .14s ease, transform .14s ease;
+    display: flex;
+    align-items: center;
+  }
+  .item:hover .arrow {
+    color: var(--ink);
+    transform: translateX(2px);
+  }
+
+  .footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px 16px;
+    border-top: 1px solid var(--line-soft);
+    gap: 12px;
+  }
+  .count {
+    font-size: 12.5px;
+    color: var(--faint);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+    letter-spacing: 0.005em;
+  }
+  .count b { color: var(--ink); font-weight: 600; }
+
+  .copy-btn {
+    background: none;
+    border: 1px solid var(--line);
+    color: var(--ink-soft);
+    padding: 6px 12px;
+    border-radius: 9px;
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background .14s, border-color .14s, color .14s;
+  }
+  .copy-btn:hover {
+    background: var(--surface-2);
+    border-color: var(--line);
+    color: var(--ink);
+  }
+  .copy-btn:active { transform: translateY(0.5px); }
+  .copy-btn:disabled { opacity: .45; cursor: not-allowed; }
+
+  .state-empty, .state-error {
+    padding: 56px 28px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .state-empty .glyph, .state-error .glyph {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 8px;
+    color: var(--faint);
+  }
+  .state-empty .msg, .state-error .msg {
+    font-size: 14.5px;
+    color: var(--ink-soft);
+    letter-spacing: -0.005em;
+  }
+  .state-empty .sub, .state-error .sub {
+    font-size: 12.5px;
+    color: var(--faint);
+  }
+  .retry-btn {
+    margin-top: 14px;
+    background: var(--ink);
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 9px;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background .14s;
+  }
+  .retry-btn:hover { background: #2a2a2a; }
+
+  .blocker-bar {
+    position: relative;
+    padding: 14px 16px 0;
+    flex-shrink: 0;
+  }
+  .blocker-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: 12px;
+    font: inherit;
+    font-size: 13.5px;
+    color: var(--ink);
+    text-align: left;
+    cursor: pointer;
+    transition: background .14s, border-color .14s;
+    min-height: 46px;
+  }
+  .blocker-trigger:hover:not(:disabled) { background: var(--surface-2); }
+  .blocker-trigger:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .blocker-trigger:disabled { opacity: .55; cursor: not-allowed; }
+
+  .blocker-trigger-logo {
+    flex-shrink: 0;
+    width: 88px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    overflow: hidden;
+  }
+  .blocker-trigger-logo img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    display: block;
+    object-fit: contain;
+  }
+  .blocker-trigger-text {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .blocker-trigger-chev {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    color: var(--muted);
+    transition: transform .18s ease;
+  }
+  .blocker-trigger[aria-expanded="true"] .blocker-trigger-chev { transform: rotate(180deg); }
+
+  .blocker-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    max-height: 360px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    left: 16px;
+    right: 16px;
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: 14px;
+    box-shadow:
+      0 1px 2px rgba(20, 18, 12, 0.06),
+      0 12px 36px rgba(20, 18, 12, 0.14);
+    max-height: 262px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) transparent;
+    padding: 5px;
+    z-index: 60;             
+    animation: menuIn .18s cubic-bezier(.21,.8,.35,1) both;
+    transform-origin: top center;
+  }
+  .blocker-menu[hidden] { display: none; }
+  .blocker-menu::-webkit-scrollbar { width: 6px; }
+  .blocker-menu::-webkit-scrollbar-track { background: transparent; }
+  .blocker-menu::-webkit-scrollbar-thumb { background: var(--line); border-radius: 999px; }
+
+  .blocker-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 9px;
+    cursor: pointer;
+    color: var(--ink);
+    font-size: 13.5px;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
+    transition: background .12s ease;
+  }
+  .blocker-option:hover { background: var(--surface-2); }
+  .blocker-option:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
+  .blocker-option[aria-selected="true"] { background: var(--green-soft); }
+
+  .blocker-option-mark {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--green);
+    opacity: 0;
+  }
+  .blocker-option[aria-selected="true"] .blocker-option-mark { opacity: 1; }
+
+  .blocker-option-logo {
+    flex-shrink: 0;
+    width: 96px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    overflow: hidden;
+  }
+  .blocker-option-logo img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    display: block;
+    object-fit: contain;
+  }
+
+  .blocker-option-text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .blocker-option-name {
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.005em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .blocker-option-desc {
+    font-size: 11.5px;
+    color: var(--faint);
+    font-weight: 400;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .blocker-option[aria-selected="true"] .blocker-option-name { color: var(--green); }
+  .blocker-option[aria-selected="true"] .blocker-option-desc { color: var(--green); }
+
+  .post-bar {
+    position: relative;
+    padding: 14px 16px 0;
+    flex-shrink: 0;
+  }
+
+  .post-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    font: inherit;
+    font-size: 13.5px;
+    color: var(--ink);
+    text-align: left;
+    cursor: pointer;
+    transition: background .14s, border-color .14s;
+    min-height: 44px;
+  }
+  .post-trigger:hover:not(:disabled) { background: var(--surface); border-color: var(--line-strong); }
+  .post-trigger:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .post-trigger:disabled { opacity: .55; cursor: not-allowed; }
+
+  .post-trigger-text {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+  }
+  .post-trigger-date {
+    flex-shrink: 0;
+    font-size: 12px;
+    color: var(--faint);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+  .post-trigger-chev {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    color: var(--muted);
+    transition: transform .18s ease;
+  }
+  .post-trigger[aria-expanded="true"] .post-trigger-chev { transform: rotate(180deg); }
+
+  .post-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 16px;
+    right: 16px;
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: 14px;
+    box-shadow:
+      0 1px 2px rgba(20, 18, 12, 0.06),
+      0 12px 36px rgba(20, 18, 12, 0.14);
+    max-height: 320px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) transparent;
+    padding: 5px;
+    z-index: 50;
+    animation: menuIn .18s cubic-bezier(.21,.8,.35,1) both;
+    transform-origin: top center;
+  }
+  .post-menu[hidden] { display: none; }
+  .post-menu::-webkit-scrollbar { width: 6px; }
+  .post-menu::-webkit-scrollbar-track { background: transparent; }
+  .post-menu::-webkit-scrollbar-thumb { background: var(--line); border-radius: 999px; }
+  @keyframes menuIn {
+    from { opacity: 0; transform: translateY(-4px) scale(.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .post-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 9px;
+    cursor: pointer;
+    color: var(--ink);
+    font-size: 13.5px;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
+    transition: background .12s ease;
+  }
+  .post-option:hover { background: var(--surface-2); }
+  .post-option:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
+  .post-option[aria-selected="true"] { background: var(--green-soft); }
+
+  .post-option-mark {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--green);
+    opacity: 0;
+  }
+  .post-option[aria-selected="true"] .post-option-mark { opacity: 1; }
+
+  .post-option-text {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+  }
+  .post-option-date {
+    flex-shrink: 0;
+    font-size: 12px;
+    color: var(--faint);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+  .post-option[aria-selected="true"] .post-option-date { color: var(--green); }
+
+  @media (max-width: 560px) {
+    body { padding: 16px 14px; }
+    .container { max-width: 100%; border-radius: 12px; }
+    .live-header { padding: 18px 18px 14px; }
+    .blocker-bar { padding: 12px 12px 0; }
+    .blocker-menu { left: 12px; right: 12px; }
+    .post-bar { padding: 12px 12px 0; }
+    .post-menu { left: 12px; right: 12px; }
+    .item { padding: 11px 12px; gap: 11px; }
+    .footer { padding: 12px 14px 14px; }
+    .list { max-height: 55vh; }
+  }
+
+  /* ---- additions in the tool's own language ----------------------------------
+     A faint category note on listed rows (clickable — flips this school's
+     policy), and the quiet "filtered out" expander under the list. */
+
+  .item .why-cat {
+    flex-shrink: 1;
+    min-width: 0;
+    max-width: 42%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: var(--faint);
+    letter-spacing: 0;
+    cursor: pointer;
+    border-bottom: 1px dotted var(--line-strong);
+    transition: color .14s ease, border-color .14s ease;
+  }
+  .item .why-cat:hover { color: var(--ink-soft); border-bottom-color: var(--muted); }
+
+  .filtered {
+    border-top: 1px solid var(--line-soft);
+    padding: 0 16px;
+    flex-shrink: 0;
+  }
+  .filtered-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 12px 0 4px;
+    background: none;
+    border: none;
+    font: inherit;
+    font-size: 12.5px;
+    color: var(--faint);
+    cursor: pointer;
+    transition: color .14s ease;
+  }
+  .filtered-toggle:hover { color: var(--muted); }
+  .filtered-toggle b {
+    color: var(--muted);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+  .filtered-toggle .chev { display: flex; transition: transform .18s ease; }
+  .filtered-toggle[aria-expanded="true"] .chev { transform: rotate(180deg); }
+
+  .filtered-list { padding: 2px 0 12px; display: none; }
+  .filtered-list.open { display: block; }
+
+  .frow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    transition: background .14s ease;
+  }
+  .frow:hover { background: var(--surface-2); }
+  .frow .fhost {
+    flex: 1;
+    min-width: 0;
+    font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas,
+                 "Liberation Mono", monospace;
+    font-size: 12.5px;
+    color: var(--muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    letter-spacing: -0.005em;
+  }
+  .frow .fwhy {
+    flex-shrink: 0;
+    font-size: 12px;
+    color: var(--faint);
+    max-width: 45%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  button.fwhy.cat {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    font-size: 12px;
+    color: var(--muted);
+    border-bottom: 1px dotted var(--line-strong);
+    cursor: pointer;
+    transition: color .14s ease, border-color .14s ease;
+  }
+  button.fwhy.cat:hover { color: var(--ink); border-bottom-color: var(--muted); }
+
+  @media (max-width: 560px) {
+    .filtered { padding: 0 14px; }
+    .item .why-cat { display: none; }
+    .frow .fwhy { max-width: 52%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .item, .blocker-menu, .post-menu { animation: none; }
+    .dots span { animation: none; opacity: .5; }
+  }
+</style>
+</head>
+<body>
+  <div class="container" id="container">
+
+    <div class="blocker-bar" id="blockerBar">
+      <button class="blocker-trigger" id="blockerTrigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+        <span class="blocker-trigger-logo" id="blockerTriggerLogo">
+          <img id="blockerTriggerLogoImg" alt="" src="" />
+        </span>
+        <span class="blocker-trigger-text" id="blockerTriggerText">Lightspeed Systems</span>
+        <span class="blocker-trigger-chev" aria-hidden="true">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+        </span>
+      </button>
+      <div class="blocker-menu" id="blockerMenu" role="listbox" hidden></div>
+    </div>
+
+    <div class="post-bar" id="postBar" style="display:none">
+      <button class="post-trigger" id="postTrigger" type="button" aria-haspopup="listbox" aria-expanded="false" disabled>
+        <span class="post-trigger-text" id="postTriggerText">Latest post</span>
+        <span class="post-trigger-date" id="postTriggerDate"></span>
+        <span class="post-trigger-chev" aria-hidden="true">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+        </span>
+      </button>
+      <div class="post-menu" id="postMenu" role="listbox" hidden></div>
+    </div>
+
+    <div class="live-header" id="liveHeader">
+      <div class="live-row">
+        <span class="live-label">
+          <span class="dots" aria-hidden="true"><span></span><span></span><span></span></span>
+          <span id="liveLabel">Looking through the latest post…</span>
+        </span>
+        <span class="live-count" id="liveCount"></span>
+      </div>
+      <div class="live-track"><div class="live-bar" id="liveBar"></div></div>
+    </div>
+
+    <div class="list" id="list"></div>
+
+    <div class="filtered" id="filteredWrap" style="display:none">
+      <button class="filtered-toggle" id="filteredToggle" type="button" aria-expanded="false">
+        <b id="filteredNum">0</b> <span id="filteredLabel">filtered out</span>
+        <span class="chev" aria-hidden="true">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+        </span>
+      </button>
+      <div class="filtered-list" id="filteredList"></div>
+    </div>
+
+    <div class="state-empty" id="stateEmpty" style="display:none">
+      <span class="glyph">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.5V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h7"/>
+          <path d="M16 19l2 2 4-4"/>
+        </svg>
+      </span>
+      <div class="msg">Nothing unblocked this time.</div>
+      <div class="sub">The blog refreshes daily — try again tomorrow.</div>
+    </div>
+
+    <div class="state-error" id="stateError" style="display:none">
+      <span class="glyph">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+        </svg>
+      </span>
+      <div class="msg" id="errorMsg">Couldn't reach the blog right now.</div>
+      <div class="sub">The relay may be busy. Try again in a minute.</div>
+      <button class="retry-btn" id="retryBtn" type="button">Try again</button>
+    </div>
+
+    <div class="footer" id="footer" style="display:none">
+      <span class="count"><b id="countNum">0</b> <span id="countLabel">unblocked</span></span>
+      <button class="copy-btn" id="copyBtn" type="button">Copy URLs</button>
+    </div>
+  </div>
+<script>
+  /* ---- config -------------------------------------------------------------- */
+
+  var BLOG_HOST = "ixlstudy.blogspot.com";
+  var LS_WS_URL =
+    "wss://production-gc.lsfilter.com?a=0ef9b862-b74f-4e8d-8aad-be549c5f452a" +
+    "&customer_id=74-1082-F000&agentType=chrome_extension&agentVersion=3.777.0" +
+    "&userGuid=00000000-0000-0000-0000-000000000000";
+  var LS_IP = "174.85.104.135";
+  var LS_CUSTOMER = "74-1082-F000";
+
+  var ICON_PATHS = ["favicon.ico", "favicon.png", "apple-touch-icon.png", "favicon-32x32.png", "favicon.svg"];
+  var WWW_ICON_PATHS = ["favicon.ico", "apple-touch-icon.png"];
+  var ICON_TIMEOUT = 6500;
+  var CONN_TIMEOUT = 8000;
+  var LOOKUP_TIMEOUT = 9000;
+  var DB_PATIENCE = 6000;         // in-wave: a lookup retries a hiccuping DB socket this long
+  var DB_PATIENCE_LONG = 15000;   // redemption pass: the DB gets a second, patient chance
+  var FP_TIMEOUT = 7000;
+  var HOST_PAR = 32;                // one wave — every host's facts are measured at once
+  var FEED_MAX = 50;
+  var FEED_TIMEOUT = 5000;
+  var VAL_TIMEOUT = 45000;
+  var PAGES_TO_SCAN = 3;
+  var ASSET_PAGE_TIMEOUT = 12000;   // relay read of a link's page, for asset extraction
+  var ASSET_VAL_TIMEOUT = 12000;    // relay read of an asset URL, to confirm it is a real image
+  var VAL_PAR = 4;                  // concurrent validator reads allowed for asset checks
+  var RELAY_BUDGET = 72;            // validator reads per scan — it is a shared public service
+  var VALIDATOR_PRIMARY = "https://validator.nu/?doc=";
+  var VALIDATOR_MIRROR = "https://validator.w3.org/nu/?doc=";
+  var VALIDATOR_OPTS = "&showsource=yes&out=json";
+
+  /* Category policy tiers for the filter DB's answer. HARD_BLOCKED: blocked
+     in essentially every school policy. SCHOOL_BLOCKED: blocked by a
+     default-deny K-12 policy — games, social media, streaming, AI, the
+     mature family, hacking, weapons, malware, translators, p2p, and
+     Domain Sharing (144: live-probed — 76% of this blog's links are
+     subdomain proxy fronts the filter answers with cat 144). Everything
+     else stays honest (Unverified) unless the user clicks an override on
+     a row — their school, their rules. The DB is never allowed to say
+     "allowed": only measured proof can. */
+  var HARD_BLOCKED = { 3:1, 4:1, 8:1, 12:1, 17:1, 21:1, 22:1, 23:1, 24:1, 25:1,
+    26:1, 27:1, 28:1, 32:1, 35:1, 52:1, 53:1, 54:1, 62:1, 65:1, 94:1, 109:1,
+    110:1, 111:1, 122:1, 123:1, 124:1, 137:1 };
+  var SCHOOL_BLOCKED = { 2:1, 13:1, 16:1, 33:1, 39:1, 42:1, 55:1, 60:1, 61:1,
+    63:1, 66:1, 69:1, 70:1, 100:1, 101:1, 102:1, 103:1, 117:1, 118:1, 125:1,
+    126:1, 134:1, 135:1, 140:1, 141:1, 144:1, 200:1, 201:1, 202:1, 203:1,
+    1001:1, 1006:1, 1007:1, 1008:1, 1012:1, 1014:1, 1016:1, 1017:1, 1084:1,
+    1119:1 };
+
+  /* ---- blocker filters -------------------------------------------------------
+     The picker selects which web filter stands in front of this network.
+     Lightspeed mode can also ask the school's own policy database (dy_lookup
+     over the production WS). Every mode scans readable responses for the
+     selected vendor's block-page fingerprints — and only measured facts
+     (decoded icons, fingerprints, dead connections) decide a verdict. */
+
+  var BLOCKERS = {
+    lightspeed:    { name: "Lightspeed Systems", db: true,
+      fps: ["lightspeed systems", "lightspeed web filter", "lightspeed rocket", "lsrwf", "lightspeed filter agent"] },
+    securly:       { name: "Securly", db: false, fps: ["securly"] },
+    goguardian:    { name: "GoGuardian", db: false, fps: ["goguardian"] },
+    fortiguard:    { name: "FortiGuard", db: false, fps: ["fortiguard"] },
+    umbrella:      { name: "Cisco Umbrella", db: false, fps: ["cisco umbrella", "opendns"] },
+    zscaler:       { name: "Zscaler", db: false, fps: ["zscaler", "zscloud"] },
+    iboss:         { name: "iBoss", db: false, fps: ["iboss"] },
+    contentkeeper: { name: "ContentKeeper", db: false, fps: ["contentkeeper", "ckauth"] },
+    barracuda:     { name: "Barracuda", db: false, fps: ["barracuda"] },
+    sophos:        { name: "Sophos", db: false, fps: ["sophos web protection", "sophos"] },
+    auto:          { name: "Auto-Detect", db: false, fps: [] }
+  };
+
+  var FP_LIST = [];
+  (function () {
+    for (var id in BLOCKERS) {
+      var b = BLOCKERS[id];
+      b.fpSet = {};
+      b.fps.forEach(function (fp) { b.fpSet[fp] = true; FP_LIST.push(fp); });
+    }
+  })();
+
+  function blockerHasFp(id, fp) {
+    if (id === "auto") return true;
+    var b = BLOCKERS[id];
+    return !!(b && b.fpSet && b.fpSet[fp]);
+  }
+
+  /* Lightspeed category id -> [name, allowedByThisPolicy]. dy_lookup speaks
+     these ids; the allowed flag is this school's policy for the category. */
+  var CAT = {0:["Unknown",0],1:["Local Allow",1],2:["Local Block",0],3:["Ads",0],4:["Mature",0],5:["Audio/Video",1],6:["Business",1],7:["Errors",0],8:["Drugs",0],9:["Education",1],10:["Business - Finance",1],11:["Forums",1],12:["Gambling",0],13:["Games",0],14:["General",1],15:["Government",1],16:["security.hacking",0],17:["violence.hate",0],18:["Business - Jobs",1],19:["Forums - Email",1],20:["News",1],21:["Porn",0],22:["porn.de",0],23:["porn.es",0],24:["porn.fr",0],25:["porn.it",0],26:["porn.jp",0],27:["porn.nl",0],28:["Security - Proxy",0],29:["Shopping",1],30:["Sports",1],31:["Suspicious",0],32:["Violence",0],33:["Security - Warez",0],34:["Directory",1],35:["ads.popup-ads",0],36:["Travel",1],37:["Automobile",1],38:["Forums - Newsgroups",1],39:["Forums - Personals",0],40:["Humor",0],41:["Education - Lifestyles",1],42:["Alcohol",0],43:["Family - Health",1],44:["Education - Science",1],45:["Entertainment",1],46:["Kids and Teens",1],47:["Education - Arts",1],48:["Education - Literature",1],49:["Music",1],50:["Education - Music",1],51:["Microsoft",0],52:["ads.banner-ads",0],53:["ads.html-ads",0],54:["ads.javascript-ads",0],55:["Spam",0],56:["Ham",1],57:["Computers",1],58:["Family - Religion",1],59:["World",1],60:["Forums - p2p",0],61:["Forums - IM",0],62:["security.spyware",0],63:["security.virus",0],64:["security.test",0],65:["security.phishing",0],66:["Weapons",0],67:["Access Denied",0],68:["Law",1],69:["Kids and Teens - Chat",0],70:["Mature - Language",0],71:["Forums - Blogs",0],72:["Security",0],73:["Business - Real Estate",1],74:["Education - Games",1],75:["Education - Social Science",1],76:["Family - Food",1],77:["kids_and_teens.animals",1],78:["Spam - Shopping",0],79:["Society",1],80:["Education - Sex",1],81:["Shopping - Auctions",0],82:["Sports - Fantasy",1],83:["Hobby",1],84:["Sports - Youth",1],85:["SafeSearch",1],86:["World - German",1],87:["World - Spanish",1],88:["World - French",1],89:["World - Italian",1],90:["World - Japanese",1],91:["World - Netherlands",1],92:["World - Portuguese",1],93:["World - Russian",1],94:["Porn - Illicit",0],95:["Family",1],96:["Society - Politics",1],97:["Society - Crime",1],98:["Sports - Martial Arts",1],99:["Education - History",1],100:["Mature - Art",0],101:["Mature - Body Art",0],102:["Mature - Games",0],103:["adult.lifestyles",0],104:["Shopping - Office Supplies",1],105:["Expired",1],106:["World - Polish",1],107:["World - Chinese",1],108:["World - Korean",1],109:["porn.pl",0],110:["porn.ru",0],111:["porn.pt",0],112:["Plagiarism",1],113:["Parked",0],114:["suspicious.script",0],115:["Business - Construction",1],116:["Security - Nettools",1],117:["Forums - Social Networking",0],118:["Forums - Dating",0],119:["Business - Manufacturing",1],120:["G-Rated",1],121:["PG-Rated",1],122:["R-Rated",0],123:["X-Rated",0],124:["S-Rated",0],125:["security.potentially_unwanted_applications",0],126:["Offensive",0],127:["Computers - File Hosting",1],128:["Computers - Consumer Electronics",1],129:["Education - Media",1],130:["security.virus_ignore",0],131:["Entertainment - Radio and TV",1],132:["Photography",1],133:["Security - Shorteners",1],134:["Security - Malware",0],135:["Security - Translators",0],136:["Computers - Storage",1],137:["Violence - Extremism",0],138:["Computers - Analytics",1],139:["Sports - Esports",1],140:["Artificial Intelligence",0],141:["AI - Generative",0],142:["AI - Detective",1],143:["Search",1],144:["Security - Domain Sharing",0],200:["Facebook",0],201:["X (formerly Twitter)",0],202:["Instagram",0],203:["Pinterest",0],900:["Education Videos",1],1001:["Testing Applications",0],1002:["MDM",1],1003:["Edgenuity",0],1004:["Staff/Student Allow",1],1006:["Staff Allow / Student Block",0],1007:["Staff/Student Block",0],1008:["Social Networking",0],1009:["Google Meet",1],1010:["Vimeo",1],1011:["Google Chat",1],1012:["Video On Demand Streaming",0],1014:["Music Streaming",0],1015:["Medical",1],1016:["eSports",0],1017:["Unknown .Zip and .Mov TLDs",0],1018:["Third-Party Requirements",1],1051:["Allowed AI",1],1052:["Bing",1],1084:["TK-8 Block",0],1117:["JH-HS Access",1],1118:["HS Access",1],1119:["Disallowed TLDs",0]};
+
+  /* ---- small utils --------------------------------------------------------- */
+
+  function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+  function withTimeout(fn, ms) {
+    return new Promise(function (resolve, reject) {
+      var ctrl = (typeof AbortController !== "undefined") ? new AbortController() : null;
+      var timer = setTimeout(function () {
+        if (ctrl) ctrl.abort();
+        reject(new Error("timed out"));
+      }, ms);
+      fn(ctrl ? ctrl.signal : undefined).then(
+        function (v) { clearTimeout(timer); resolve(v); },
+        function (e) { clearTimeout(timer); reject(e); }
+      );
+    });
+  }
+
+  function bust(url) {
+    return url + (url.indexOf("?") < 0 ? "?" : "&") + "_ls=" +
+      Date.now() + Math.floor(Math.random() * 1e5);
+  }
+
+  function store(key, val) { try { localStorage.setItem(key, val); } catch (e) {} }
+  function unstore(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+
+  /* Per-category policy overrides the user clicks into place: {catId: 0|1}
+     — 0 = blocked at this school, 1 = allowed. They outrank both tiers. */
+  var catOverrides = (function () {
+    try {
+      var o = JSON.parse(unstore("ls19.catPolicy") || "{}");
+      return (o && typeof o === "object") ? o : {};
+    } catch (e) { return {}; }
+  })();
+  function catBlocked(id) {
+    var k = String(id);
+    if (Object.prototype.hasOwnProperty.call(catOverrides, k)) return catOverrides[k] === 0;
+    return !!(HARD_BLOCKED[id] || SCHOOL_BLOCKED[id]);
+  }
+  function catAllowed(id) {
+    var k = String(id);
+    if (Object.prototype.hasOwnProperty.call(catOverrides, k)) return catOverrides[k] === 1;
+    if (HARD_BLOCKED[id] || SCHOOL_BLOCKED[id]) return false;
+    var c = CAT[id];
+    return !!(c && c[1]);   /* allowed-class category (Education, Search, News, ...) */
+  }
+  function saveCatOverrides() { store("ls19.catPolicy", JSON.stringify(catOverrides)); }
+
+  function decodeEntities(s) {
+    return String(s)
+      .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"')
+      .replace(/&#0?39;/g, "'").replace(/&apos;/g, "'").replace(/&amp;/g, "&");
+  }
+
+  function hostOf(url) {
+    var s = url.replace(/^[a-z][a-z0-9+.-]*:\/\//i, "");
+    var host = s.split(/[\/:?#]/)[0].toLowerCase().trim();
+    if (host.indexOf("www.") === 0 && host.indexOf(".", 4) !== -1) host = host.slice(4);
+    return host;
+  }
+
+  var IPV4_RE = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/;
+  function validHost(h) {
+    if (!h || h.length < 3 || h.length > 253) return false;
+    if (IPV4_RE.test(h)) return true;
+    if (h.indexOf(".") === -1) return false;
+    var labels = h.split(".");
+    for (var i = 0; i < labels.length; i++) {
+      var l = labels[i];
+      if (!l || l.length > 63) return false;
+      if (!/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i.test(l)) return false;
+    }
+    return true;
+  }
+
+  function slugToTitle(slug) {
+    return slug.split("-").map(function (w) {
+      if (/^\d+$/.test(w)) return w;
+      if (w.length <= 3 && w === w.toLowerCase()) return w.toUpperCase();
+      return w.charAt(0).toUpperCase() + w.slice(1);
+    }).join(" ");
+  }
+
+  function prettyGroupName(name) {
+    var s = String(name || "").replace(/[_-]+/g, " ").trim();
+    if (!s) return "Links";
+    s = s.split(" ").map(function (w) {
+      if (w.length > 1 && w === w.toUpperCase()) return w;
+      if (/[A-Z]/.test(w.slice(1))) return w;
+      return w.charAt(0).toUpperCase() + w.slice(1);
+    }).join(" ");
+    return s;
+  }
+
+  /* ---- reading the blog ------------------------------------------------------
+     The blog itself is usually filtered at school, so reading it goes through
+     the W3C validator relay (it fetches the page from the open internet and
+     its JSON output carries the source). Fast path first: the blog's own JSON
+     feed via JSONP — one request, real titles, full post content. */
+
+  /* One relay read with the full retry ladder. Returns the validator's parsed
+     JSON — or null when every attempt failed. The relay's own messages are a
+     readable view of the open internet: "Non-XML Content-Type" proves a real
+     image, "HTTP resource not retrievable ... 403/410" proves the ORIGIN
+     ITSELF refuses the request (a dead mirror, not a filter). */
+  function validatorRead(url, signal) {
+    var target = VALIDATOR_PRIMARY + encodeURIComponent(url) + VALIDATOR_OPTS;
+    var mirror = VALIDATOR_MIRROR + encodeURIComponent(url) + VALIDATOR_OPTS;
+    function attempt(u) {
+      return fetch(u, { signal: signal }).then(function (r) {
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return r.json();
+      });
+    }
+    return attempt(target)
+      .catch(function (e) {
+        if (e && e.name === "AbortError") throw e;
+        return sleep(400).then(function () { return attempt(mirror); });
+      })
+      .catch(function (e) {
+        if (e && e.name === "AbortError") throw e;
+        return sleep(500).then(function () { return attempt(target); });
+      })
+      .catch(function (e) {
+        if (e && e.name === "AbortError") throw e;
+        return sleep(400).then(function () { return attempt(mirror); });
+      })
+      .catch(function () { return null; });
+  }
+
+  function fetchViaValidator(url, signal) {
+    return validatorRead(url, signal).then(function (data) {
+      var src = data && data.source;
+      var code = src && typeof src.code === "string" ? src.code : "";
+      if (!code) throw new Error("validator returned no source");
+      return code;
+    });
+  }
+
+  /* What the relay's messages prove about a URL, or null when they prove
+     nothing (relay unreachable, or an ordinary page with no telltale). */
+  function relayVerdictFromMessages(data) {
+    if (!data || !data.messages) return null;
+    var isImage = false, refuses = 0;
+    (data.messages || []).forEach(function (m) {
+      var t = (m && m.message) || "";
+      var mm = /Non-XML Content-Type:\s*["\u201c]?([^"\u201c;]+)["\u201d;]?/i.exec(t);
+      if (mm) {
+        var mime = mm[1].replace(/^[\u201c"']+|[\u201d"']+$/g, "").trim();
+        if (/^image\//i.test(mime) || /icon/i.test(mime)) isImage = true;
+      }
+      var rm = /HTTP resource not retrievable\. The HTTP status from the remote server was:\s*(\d{3})/i.exec(t);
+      if (rm) refuses = +rm[1];
+    });
+    if (refuses === 403 || refuses === 410) return { refuses: refuses };
+    if (isImage) return { isImage: true };
+    return null;
+  }
+
+  var POST_URL_RE = new RegExp(
+    "https://" + BLOG_HOST.replace(/\./g, "\\.") +
+    "/(\\d{4})/(\\d{2})/([a-z0-9-]+)\\.html", "g");
+
+  function extractPostIndex(html) {
+    var posts = [];
+    var seen = new Set();
+    var re = POST_URL_RE;
+    re.lastIndex = 0;
+    var m;
+    while ((m = re.exec(html)) !== null) {
+      if (!seen.has(m[0])) {
+        seen.add(m[0]);
+        posts.push({ url: m[0], slug: m[3], title: slugToTitle(m[3]),
+          date: m[1] + "-" + m[2] + "-01", at: m.index });
+      }
+    }
+    var ts = [];
+    var tre = /datetime=["']([^"']+)["']/g;
+    var t;
+    while ((t = tre.exec(html)) !== null) ts.push({ v: t[1], at: t.index });
+    posts.forEach(function (p) {
+      for (var i = 0; i < ts.length; i++) {
+        if (ts[i].at > p.at) { p.date = ts[i].v; break; }
+      }
+    });
+    return { posts: posts, timestamps: ts.map(function (x) { return x.v; }) };
+  }
+
+  function discoverPostsRelay(onProgress, onPage) {
+    var all = [];
+    var seen = new Set();
+    function addPosts(list) {
+      list.forEach(function (p) { if (!seen.has(p.url)) { seen.add(p.url); all.push(p); } });
+    }
+    function scanPage(url) {
+      if (onProgress) onProgress(all.length);
+      return withTimeout(function (sig) { return fetchViaValidator(url, sig); }, VAL_TIMEOUT)
+        .then(function (html) {
+          var idx = extractPostIndex(html);
+          addPosts(idx.posts);
+          if (onPage) onPage(all);
+          return idx;
+        });
+    }
+    return scanPage("https://" + BLOG_HOST + "/").then(function (first) {
+      if (!all.length) throw new Error("no posts found on the blog");
+      var chain = Promise.resolve(first);
+      for (var page = 1; page < PAGES_TO_SCAN; page++) {
+        (function (pageNum) {
+          chain = chain.then(function (prev) {
+            var oldest = prev.timestamps[prev.timestamps.length - 1];
+            if (!oldest || all.length >= 15) return prev;
+            var next = "https://" + BLOG_HOST + "/search?updated-max=" +
+              encodeURIComponent(oldest) + "&max-results=12";
+            return scanPage(next).catch(function () { return prev; });
+          });
+        })(page);
+      }
+      return chain.then(function () { return all; });
+    });
+  }
+
+  function fetchFeedViaJsonp(maxResults, timeoutMs) {
+    return new Promise(function (resolve, reject) {
+      var cb = "__lsFeed" + Date.now() + Math.floor(Math.random() * 100000);
+      var script = document.createElement("script");
+      var done = false;
+      var timer = null;
+      function cleanup() {
+        if (done) return;
+        done = true;
+        clearTimeout(timer);
+        try { delete window[cb]; } catch (err) { window[cb] = undefined; }
+        if (script.parentNode) script.parentNode.removeChild(script);
+      }
+      timer = setTimeout(function () {
+        cleanup();
+        reject(new Error("feed timed out"));
+      }, timeoutMs);
+      window[cb] = function (data) {
+        cleanup();
+        resolve(data);
+      };
+      script.onerror = function () {
+        cleanup();
+        reject(new Error("feed request failed"));
+      };
+      script.src = "https://" + BLOG_HOST +
+        "/feeds/posts/default?alt=json-in-script&callback=" + cb +
+        "&max-results=" + maxResults;
+      document.head.appendChild(script);
+    });
+  }
+
+  function extractLinks(contentHtml) {
+    var html = decodeEntities(contentHtml);
+    var links = [];
+    var seen = new Set();
+    var lpIdx = html.indexOf("linkParts");
+    if (lpIdx !== -1) {
+      var objStart = html.indexOf("{", lpIdx);
+      var depth = 0, end = -1, inStr = null, esc = false;
+      for (var i = objStart; i < html.length && i < objStart + 200000; i++) {
+        var ch = html[i];
+        if (inStr) {
+          if (esc) { esc = false; }
+          else if (ch === "\\") { esc = true; }
+          else if (ch === inStr) { inStr = null; }
+          continue;
+        }
+        if (ch === "'" || ch === '"') { inStr = ch; continue; }
+        if (ch === "{") depth++;
+        else if (ch === "}") { depth--; if (depth === 0) { end = i; break; } }
+      }
+      if (end !== -1) {
+        var block = html.slice(objStart, end + 1);
+        var groupRe = /([A-Za-z0-9_$]+)\s*:\s*\[/g;
+        var gm, groups = [];
+        while ((gm = groupRe.exec(block)) !== null) groups.push({ name: gm[1], start: gm.index + gm[0].length - 1 });
+        for (var g = 0; g < groups.length; g++) {
+          var gName = groups[g].name;
+          var gEnd = g + 1 < groups.length ? groups[g + 1].start : block.length;
+          var gBlock = block.slice(groups[g].start, gEnd);
+          var partRe = /p1\s*:\s*(['"])([\s\S]*?)\1\s*,\s*p2\s*:\s*(['"])([\s\S]*?)\3\s*,\s*p3\s*:\s*(['"])([\s\S]*?)\5/g;
+          var pm;
+          while ((pm = partRe.exec(gBlock)) !== null) {
+            var url = pm[2] + pm[4] + pm[6];
+            var host = hostOf(url);
+            var key = gName + "|" + host;
+            if (validHost(host) && !seen.has(key)) {
+              seen.add(key);
+              links.push({ url: url, host: host, group: gName });
+            }
+          }
+        }
+      }
+    }
+    if (!links.length) {
+      var re = /https?:\/\/[^\s<>"'\\)\]]+/gi;
+      var m;
+      while ((m = re.exec(html)) !== null) {
+        var u2 = m[0].replace(/[.,;]+$/, "");
+        var h2 = hostOf(u2);
+        if (validHost(h2) && !seen.has(h2)) {
+          seen.add(h2);
+          links.push({ url: u2, host: h2, group: "links" });
+        }
+      }
+    }
+    return links;
+  }
+
+  /* ---- lightspeed's own filter database --------------------------------------
+     dy_lookup over the production WS is the same channel the school's filter
+     agents use: it answers with the category THIS customer's policy applies
+     to a host. It is only consulted when the browser itself couldn't prove
+     anything (no icon decoded, no fingerprint matched) — and a hiccuping
+     socket no longer poisons the scan: lookups retry through a short
+     blackout, and a redemption pass re-asks anything that filtered out for
+     lack of proof once the socket answers again. */
+
+  var socket = null;
+  var connected = false;
+  var connecting = null;
+  var pending = new Map();
+  var dbInflight = new Map();
+  var dbCache = new Map();
+  var lsDeadUntil = 0;
+
+  function teardown(reason) {
+    connected = false;
+    socket = null;
+    pending.forEach(function (entry) {
+      clearTimeout(entry.timer);
+      entry.reject(new Error(reason || "connection closed"));
+    });
+    pending.clear();
+  }
+
+  function connect() {
+    if (connected && socket && socket.readyState === 1) return Promise.resolve(socket);
+    if (connecting) return connecting;
+    if (Date.now() < lsDeadUntil) return Promise.reject(new Error("lightspeed unreachable"));
+
+    connecting = new Promise(function (resolve, reject) {
+      var ws;
+      try { ws = new WebSocket(LS_WS_URL); }
+      catch (e) { connecting = null; lsDeadUntil = Date.now() + 4000; return reject(e); }
+
+      var timer = setTimeout(function () {
+        try { ws.close(); } catch (e) {}
+        connecting = null;
+        lsDeadUntil = Date.now() + 4000;
+        reject(new Error("Connection timed out"));
+      }, 10000);
+
+      ws.onopen = function () {
+        clearTimeout(timer);
+        socket = ws;
+        connected = true;
+        connecting = null;
+        resolve(ws);
+      };
+      ws.onerror = function () {
+        clearTimeout(timer);
+        var wasConnecting = !!connecting;
+        connecting = null;
+        if (wasConnecting) { lsDeadUntil = Date.now() + 4000; reject(new Error("Could not reach Lightspeed")); }
+        teardown("connection error");
+      };
+      ws.onclose = function () {
+        clearTimeout(timer);
+        var wasConnecting = !!connecting;
+        connecting = null;
+        if (wasConnecting) { lsDeadUntil = Date.now() + 4000; reject(new Error("Connection refused")); }
+        teardown("connection closed");
+      };
+      ws.onmessage = function (ev) {
+        var msg;
+        try { msg = JSON.parse(typeof ev.data === "string" ? ev.data : String(ev.data)); }
+        catch (e) { return; }
+
+        var host = (msg && msg.request && typeof msg.request.host === "string") ? msg.request.host : null;
+        if (host === null && msg && typeof msg.host === "string") host = msg.host;
+        if (host === null || !pending.has(host)) return;
+
+        var entry = pending.get(host);
+        if (typeof msg.cat === "number") {
+          pending.delete(host);
+          clearTimeout(entry.timer);
+          entry.resolve({ cat: msg.cat });
+        } else if (msg.status === 500) {
+          if (entry.retries < 1) {
+            entry.retries++;
+            try {
+              ws.send(JSON.stringify({ action: "dy_lookup", host: host, ip: LS_IP, customerId: LS_CUSTOMER }));
+            } catch (e) {
+              pending.delete(host); clearTimeout(entry.timer);
+              entry.reject(new Error("send failed"));
+            }
+          } else {
+            pending.delete(host);
+            clearTimeout(entry.timer);
+            entry.reject(new Error("Server rejected lookup"));
+          }
+        }
+      };
+    });
+    return connecting;
+  }
+
+  function lookupOnce(host) {
+    return new Promise(function (resolve, reject) {
+      if (!socket || socket.readyState !== 1) { reject(new Error("Not connected")); return; }
+      var entry = { resolve: resolve, reject: reject, retries: 0, timer: null };
+      function fail(e) {
+        pending.delete(host);
+        clearTimeout(entry.timer);
+        reject(e || new Error("Lookup failed"));
+      }
+      function send() {
+        try {
+          socket.send(JSON.stringify({ action: "dy_lookup", host: host, ip: LS_IP, customerId: LS_CUSTOMER }));
+        } catch (e) { fail(e); }
+      }
+      function onTimeout() {
+        if (entry.retries < 1 && socket && socket.readyState === 1) {
+          entry.retries++;
+          entry.timer = setTimeout(onTimeout, LOOKUP_TIMEOUT);
+          send();
+        } else {
+          fail(new Error("Timed out"));
+        }
+      }
+      entry.timer = setTimeout(onTimeout, LOOKUP_TIMEOUT);
+      pending.set(host, entry);
+      send();
+    });
+  }
+
+  function lookup(host, attempt, started, patience) {
+    attempt = attempt || 0;
+    started = started || Date.now();
+    patience = patience || DB_PATIENCE;
+    if (dbCache.has(host)) return Promise.resolve(dbCache.get(host));
+    if (dbInflight.has(host)) return dbInflight.get(host);
+    var p = lookupOnce(host).then(function (v) {
+      dbCache.set(host, v);
+      dbInflight.delete(host);
+      return v;
+    }, function (e) {
+      dbInflight.delete(host);
+      var msg = (e && e.message) || "";
+      if (attempt < 24 && Date.now() - started < patience &&
+          (msg === "Not connected" || msg === "connection closed" ||
+           msg === "connection error" || msg === "send failed" ||
+           msg === "lightspeed unreachable" || msg === "Connection timed out" ||
+           msg === "Could not reach Lightspeed" || msg === "Connection refused")) {
+        /* the socket hiccuped — wait out the short blackout, then try the
+           connection again while the wave (or redemption pass) still cares */
+        return sleep(1000).then(function () {
+          return connect().then(function () {}, function () {});
+        }).then(function () {
+          return lookup(host, attempt + 1, started, patience);
+        });
+      }
+      throw e;
+    });
+    dbInflight.set(host, p);
+    return p;
+  }
+
+  /* ---- the engine -------------------------------------------------------------
+     One question per host: what actually happens when THIS browser touches it?
+     Every fact is measured in ONE parallel wave — the page scan, the local
+     icon decode and the filter DB all run at once, nothing waits in line:
+       1. readable answer carrying the selected blocker's fingerprints
+                                                     -> Blocked, measured.
+          readable and clean of every fingerprint    -> Unblocked, measured.
+       2. an icon the host serves decodes HERE       -> Unblocked, verified.
+          (when the media-bypass canary has fired, icons prove nothing)
+       3. icons actively refused HERE (an answer, not a timeout): ONE relay
+          read of the same favicon decides — a genuine image is alive out
+          there                                   -> Blocked, "Site Live,
+                                                          Blocked Here".
+          a favicon 403/410 proves nothing (S3 403s every missing key) —
+          the link ITSELF is read once: refused to everyone -> Blocked,
+          "Site Refuses". A timed-out icon is a slow host, never proof.
+       4. still unproven: the page-asset two-sided check, then (Lightspeed
+          mode) the school's own filter database — which may only ever say
+          Blocked for near-universally filtered categories, else Unverified.
+       5. last: does the connection itself survive?  A dead line filters out
+          as "No Connection" (never claimed Blocked — this filter answers
+          with a block page, it does not drop), an answering host with no
+          proof stays honestly Unverified. */
+
+  var hostCache = new Map();
+  var hostInflight = new Map();
+  var iconCache = new Map();
+  var fpCache = new Map();
+
+  var currentBlocker = "lightspeed";
+  var verdictEpoch = 0;   // bumped when the blocker changes — verdicts are blocker-specific
+
+  /* One icon probe with a three-way outcome: "hit" (bytes decoded), "error"
+     (someone ANSWERED with a non-image — an active refusal, fast), or
+     "timeout" (nobody answered in time — a slow or silently-dropping host).
+     Only an active refusal may combine with a relay-confirmed image into a
+     Blocked verdict; a timeout proves nothing either way. */
+  function probeIconResult(url, ms, noBust) {
+    return new Promise(function (resolve) {
+      var img = new Image();
+      var done = false;
+      var timer = setTimeout(function () {
+        if (done) return;
+        done = true;
+        img.onload = img.onerror = null;
+        img.src = "";
+        resolve("timeout");
+      }, ms);
+      img.onload = function () {
+        if (done) return;
+        done = true; clearTimeout(timer); resolve("hit");
+      };
+      img.onerror = function () {
+        if (done) return;
+        done = true; clearTimeout(timer); resolve("error");
+      };
+      img.referrerPolicy = "no-referrer";
+      img.src = noBust ? url : bust(url);
+    });
+  }
+
+  function probeIcon(url, ms, noBust) {
+    return probeIconResult(url, ms, noBust).then(function (r) { return r === "hit"; });
+  }
+
+  /* The icon wave: every candidate fires at once, the first decode settles
+     it, and the outcome records whether anything was actively refused. */
+  function tryIconUrls(urls) {
+    return new Promise(function (resolve) {
+      var left = urls.length;
+      var out = { decoded: false, refused: false };
+      if (!left) { resolve(out); return; }
+      urls.forEach(function (u) {
+        probeIconResult(u, ICON_TIMEOUT).then(function (r) {
+          if (r === "hit") { out.decoded = true; resolve(out); }
+          else {
+            if (r === "error") out.refused = true;
+            if (!out.decoded && --left === 0) resolve(out);
+          }
+        });
+      });
+    });
+  }
+
+  function anyIcon(host) {
+    var urls = ICON_PATHS.map(function (p) { return "https://" + host + "/" + p; });
+    if (host.indexOf("www.") !== 0) {
+      WWW_ICON_PATHS.forEach(function (p) { urls.push("https://www." + host + "/" + p); });
+    }
+    return tryIconUrls(urls);   // one wave — the first icon to decode settles it
+  }
+
+  function anyIconCached(host) {
+    if (iconCache.has(host)) return Promise.resolve(iconCache.get(host));
+    return anyIcon(host).then(function (v) {
+      iconCache.set(host, v);
+      return v;
+    });
+  }
+
+  /* Readable-response scan. Tries the actual link URL first, then the host
+     root. When a response IS readable, the origin itself answered with CORS
+     permission — a filter block page never does — so a vendor fingerprint
+     inside it is proof the filter answered (Blocked), and a clean readable
+     body is proof the real page loaded here (Unblocked). Result is a cached
+     per-host fact, independent of the selected blocker. */
+  function fpScan(host, repUrl) {
+    if (fpCache.has(host)) return Promise.resolve(fpCache.get(host));
+    var targets = [];
+    if (repUrl && repUrl.indexOf("https://" + host + "/") === 0) targets.push(repUrl);
+    targets.push("https://" + host + "/");
+    var p = Promise.all(targets.map(function (u, i) {
+      return withTimeout(function (sig) {
+        return fetch(i === 0 ? u : bust(u), {
+          method: "GET",
+          mode: "cors",
+          cache: "no-store",
+          redirect: "follow",
+          credentials: "omit",
+          signal: sig
+        }).then(function (r) { return r.text(); });
+      }, FP_TIMEOUT).catch(function () { return null; });
+    })).then(function (bodies) {
+      var out = { readable: false, fp: null };
+      for (var i = 0; i < bodies.length; i++) {
+        var txt = bodies[i];
+        if (txt == null) continue;
+        var head = String(txt).slice(0, 8000).toLowerCase();
+        for (var j = 0; j < FP_LIST.length; j++) {
+          if (head.indexOf(FP_LIST[j]) !== -1) {
+            fpCache.set(host, { readable: true, fp: FP_LIST[j] });
+            return { readable: true, fp: FP_LIST[j] };
+          }
+        }
+        out.readable = true;              // readable and clean of every fingerprint
+      }
+      fpCache.set(host, out);
+      return out;
+    });
+    fpCache.set(host, p);
+    return p;
+  }
+
+  function probeConnection(host, attempt) {
+    attempt = attempt || 0;
+    var ctrl = (typeof AbortController !== "undefined") ? new AbortController() : null;
+    var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, CONN_TIMEOUT);
+    return fetch(bust("https://" + host + "/"), {
+      method: "GET",
+      mode: "no-cors",
+      cache: "no-store",
+      redirect: "follow",
+      credentials: "omit",
+      signal: ctrl ? ctrl.signal : undefined
+    }).then(function () {
+      clearTimeout(timer);
+      return true;
+    }).catch(function () {
+      clearTimeout(timer);
+      if (attempt < 1) {
+        return sleep(400).then(function () { return probeConnection(host, attempt + 1); });
+      }
+      return false;
+    });
+  }
+
+  /* DNS-over-HTTPS: does this domain exist at all on the open internet?
+     Separates "the filter drops it" from "the domain is simply dead". */
+  var dohCache = new Map();
+  function domainResolves(host) {
+    if (dohCache.has(host)) return Promise.resolve(dohCache.get(host));
+    var p = fetch("https://dns.google/resolve?name=" + encodeURIComponent(host) + "&type=A", {
+      cache: "no-store"
+    }).then(function (r) { return r.json(); })
+      .then(function (d) { return !!(d && d.Status === 0 && d.Answer && d.Answer.length); })
+      .catch(function () {
+        return fetch("https://cloudflare-dns.com/dns-query?name=" + encodeURIComponent(host) + "&type=A", {
+          headers: { accept: "application/dns-json" }, cache: "no-store"
+        }).then(function (r) { return r.json(); })
+          .then(function (d) { return !!(d && d.Status === 0 && d.Answer && d.Answer.length); })
+          .catch(function () { return null; });   // DoH unreachable — caller keeps the safe default
+      });
+    dohCache.set(host, p);
+    return p;
+  }
+
+  function fallbackVerdict(host) {
+    return probeConnection(host).then(function (up) {
+      if (up) return { state: "unknown", via: "unverified" };
+      return domainResolves(host).then(function (resolves) {
+        if (resolves === false) return { state: "unknown", via: "dead" };
+        /* a silent drop is NOT this filter's signature — it answers blocked
+           hosts with a block page. Filtered, but never claimed Blocked. */
+        return { state: "unknown", via: "unreachable" };
+      });
+    });
+  }
+
+  /* ---- media-bypass canary ----------------------------------------------------
+     The blog host is measured at boot: if its own feed loads it is unblocked;
+     if the feed fails but the relay reads it, it is filtered HERE. When a
+     known-filtered host still serves a decodable icon, image requests bypass
+     the filter — icon decode can no longer prove a page opens. */
+
+  var iconTrust = true;
+  var blogBlocked = null;
+  var canaryNote = "";
+
+  function calibrateIconTrust() {
+    if (blogBlocked !== true) return Promise.resolve();
+    return anyIcon(BLOG_HOST).then(function (r) {
+      if (r && r.decoded) {
+        iconTrust = false;
+        canaryNote = "This network serves images for blocked sites, so icon checks are disabled — Unblocked now requires a measured page load.";
+      }
+    }, function () {});
+  }
+
+
+  /* Verdicts settle the moment anything proves them — an allowed-category
+     link shows up after a short window for a readable block page to veto,
+     measured proofs (a loaded page, a decoded icon) settle instantly, and a
+     blocked-category verdict waits the wave out so a late icon can still
+     rescue it. When the last fact lands, an authoritative pass reconciles
+     anything the fast paths got wrong. */
+  var onVerdictUpdate = null;   /* glue hooks in to reconcile the visible list */
+
+  function checkHost(host, repUrl, dbPatience) {
+    var myEpoch = verdictEpoch;
+    if (hostCache.has(host)) return Promise.resolve(hostCache.get(host));
+    var infl = hostInflight.get(host);
+    if (infl && infl.epoch === myEpoch) return infl.p;
+    var entry = null;
+    var p = new Promise(function (resolve) {
+      var done = false;
+      var early = null;
+      function settle(v) {
+        if (done) return v;
+        done = true;
+        early = v;
+        resolve(v);
+        return v;
+      }
+      var t0 = Date.now();
+      var pageP = fpScan(host, repUrl);
+      var iconP = anyIconCached(host);
+      var dbP = (BLOCKERS[currentBlocker] && BLOCKERS[currentBlocker].db)
+        ? lookup(host, 0, 0, dbPatience || DB_PATIENCE).catch(function () { return null; })
+        : Promise.resolve(null);
+
+      function dbVerdict(db) {
+        var cat = CAT[db.cat] || CAT[0];
+        if (catBlocked(db.cat)) {
+          return { state: "blocked", via: "db", cat: cat[0], catId: db.cat };
+        }
+        if (catAllowed(db.cat)) {
+          return { state: "ok", via: "dbok", cat: cat[0], catId: db.cat };
+        }
+        return { state: "unknown", via: "cat", cat: cat[0], catId: db.cat };
+      }
+
+      function fromPage(page) {
+        if (!(page && page.readable)) return null;
+        if (page.fp) {
+          return blockerHasFp(currentBlocker, page.fp)
+            ? { state: "blocked", via: "fp" }
+            : { state: "unknown", via: "conflict" };
+        }
+        return { state: "ok", via: "read" };
+      }
+
+      pageP.then(function (page) {
+        if (myEpoch !== verdictEpoch) return;
+        var v = fromPage(page);
+        if (v) settle(v);
+      });
+
+      iconP.then(function (r) {
+        if (myEpoch !== verdictEpoch) return;
+        if (r && r.decoded && iconTrust) settle({ state: "ok", via: "verified" });
+      });
+
+      dbP.then(function (db) {
+        if (myEpoch !== verdictEpoch || !db) return;
+        var v = dbVerdict(db);
+        if (v.state === "ok") {
+          /* allowed-class lists fast — leaving a short window in which a
+             readable block page still vetoes the category's word */
+          var wait = Math.max(0, 1200 - (Date.now() - t0));
+          setTimeout(function () {
+            if (myEpoch !== verdictEpoch) return;
+            settle(v);
+          }, wait);
+        } else {
+          /* blocked / unknown wait the wave out: a late-decoding icon or a
+             late-arriving readable page outranks the category both ways */
+          Promise.all([pageP, iconP]).then(function () {
+            if (myEpoch !== verdictEpoch) return;
+            settle(v);
+          });
+        }
+      });
+
+      /* authoritative pass — reconciles anything settled early */
+      Promise.all([pageP, iconP, dbP]).then(function (pair) {
+        if (myEpoch !== verdictEpoch) return;
+        var page = pair[0], iconR = pair[1], db = pair[2];
+        var final = fromPage(page);
+        if (!final && iconR && iconR.decoded && iconTrust) {
+          final = { state: "ok", via: "verified" };
+        }
+        if (!final && db) final = dbVerdict(db);
+        if (!final) {
+          return fallbackVerdict(host).then(function (fv) {
+            if (myEpoch !== verdictEpoch) return;
+            settle(fv);
+            if (early && fv && fv.state !== early.state && typeof onVerdictUpdate === "function") {
+              onVerdictUpdate(host, fv);
+            }
+          });
+        }
+        if (settle(final) !== final) {
+          /* settled earlier with something else */
+          if (early && final.state !== early.state && typeof onVerdictUpdate === "function") {
+            onVerdictUpdate(host, final);
+          }
+        }
+      });
+    });
+    entry = { epoch: myEpoch, p: p };
+    hostInflight.set(host, entry);
+    p.then(function (v) {
+      if (hostInflight.get(host) === entry) hostInflight.delete(host);
+      /* fallback verdicts (nothing measured, DB silent) stay uncached — a
+         later wave or the redemption pass re-asks once it recovers */
+      if (myEpoch === verdictEpoch && v && v.via !== "unverified" &&
+          v.via !== "unreachable" && v.via !== "dead") hostCache.set(host, v);
+    }, function () {
+      if (hostInflight.get(host) === entry) hostInflight.delete(host);
+    });
+    return p;
+  }
+  /* ---- discovery ------------------------------------------------------------ */
+
+  function discoverPostsViaFeed() {
+    return fetchFeedViaJsonp(FEED_MAX, FEED_TIMEOUT).then(function (data) {
+      var entries = (data && data.feed && data.feed.entry) || [];
+      var out = [];
+      entries.forEach(function (e) {
+        var alt = "";
+        (e.link || []).forEach(function (l) { if (l.rel === "alternate") alt = l.href; });
+        if (!alt) return;
+        var title = (e.title && e.title.$t) || slugToTitle(alt);
+        var date = (e.published && e.published.$t) || "";
+        var content = (e.content && e.content.$t) || "";
+        out.push({ title: title, date: date, url: alt,
+          links: extractLinks(content), loaded: true });
+      });
+      if (!out.length) throw new Error("feed had no usable posts");
+      return out;
+    });
+  }
+
+  function present(found) {
+    posts = found;
+    postSel.textContent = "";
+    var all = document.createElement("option");
+    all.value = "__all__";
+    all.textContent = "Every Post (All Links)";
+    postSel.appendChild(all);
+    posts.forEach(function (p, i) {
+      var o = document.createElement("option");
+      o.value = String(i);
+      o.textContent = p.title + (p.date ? " (" + shortDate(p.date) + ")" : "");
+      postSel.appendChild(o);
+    });
+    postSel.disabled = false;
+
+    var saved = unstore("ls19.post");
+    var idx = 0;
+    if (saved === "__all__") idx = -1;
+    else if (saved) {
+      for (var i = 0; i < posts.length; i++) {
+        if (posts[i].url === saved) { idx = i; break; }
+      }
+    }
+    currentPost = idx;
+    postSel.value = idx === -1 ? "__all__" : String(Math.max(idx, 0));
+    scan();
+  }
+
+  function gatherAllLinks(onProgress) {
+    var results = new Array(posts.length);
+    var next = 0, done = 0;
+    var PAR = 6;
+    function readOne(p) {
+      if (p.loaded) return Promise.resolve(p.links);
+      onProgress(Math.min(done + PAR, posts.length), posts.length);
+      return withTimeout(function (sig) { return fetchViaValidator(p.url, sig); }, VAL_TIMEOUT)
+        .then(function (html) {
+          p.links = extractLinks(html);
+          p.loaded = true;
+          return p.links;
+        })
+        .catch(function () { return []; });
+    }
+    function worker() {
+      if (next >= posts.length) return Promise.resolve();
+      var i = next++;
+      return readOne(posts[i]).then(function (ls) {
+        results[i] = ls;
+        done++;
+        return worker();
+      });
+    }
+    var starters = [];
+    for (var w = 0; w < Math.min(PAR, posts.length); w++) starters.push(worker());
+    return Promise.all(starters).then(function () {
+      var merged = [], seen = new Set();
+      results.forEach(function (ls) {
+        (ls || []).forEach(function (l) {
+          var k = l.group + "|" + l.host;
+          if (!seen.has(k)) { seen.add(k); merged.push(l); }
+        });
+      });
+      return merged;
+    });
+  }
+
+  function gatherLinks(post) {
+    if (!post) {
+      return gatherAllLinks(function (d, t) {
+        setStatus("Reading every post — " + d + " of " + t + "…");
+      });
+    }
+    if (post.loaded) return Promise.resolve(post.links || []);
+    setStatus("Reading this post through the relay…");
+    return withTimeout(function (sig) { return fetchViaValidator(post.url, sig); }, VAL_TIMEOUT)
+      .then(function (html) {
+        post.links = extractLinks(html);
+        post.loaded = true;
+        return post.links;
+      })
+      .catch(function () { return []; });
+  }
+
+var LOGOS = {"lightspeed": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjguOTMiIGhlaWdodD0iNDQuOTU2IiB2aWV3Qm94PSIwIDAgMTI4LjkzIDQ0Ljk1NiI+PGRlZnM+PHN0eWxlPi5he2ZpbGw6IzAwYWZkNzt9LmJ7ZmlsbDojNDA0ZDUzO308L3N0eWxlPjwvZGVmcz48cGF0aCBjbGFzcz0iYSIgZD0iTTExLjc4Miw0NC45NTZoLS4wNjhhMTEuNjY1LDExLjY2NSwwLDAsMS0uMDQzLTIzLjMyOUgyNi4yNDJBOS45NjMsOS45NjMsMCwwLDAsMjYuMiwxLjdoLS4wNTlhOS45OTUsOS45OTUsMCwwLDAtOS45NTQsOS45MzF2NC40ODJIMTQuNDc2VjExLjcyM0ExMS43LDExLjcsMCwwLDEsMjYuMTM1LDBIMjYuMmExMS42NjUsMTEuNjY1LDAsMCwxLC4wNDQsMjMuMzI5SDExLjY3NmExMCwxMCwwLDAsMC05Ljk5LDkuOTg0LDkuOTg3LDkuOTg3LDAsMCwwLDEwLjAwOCw5Ljk0NmguMDc5YTEwLjAxOCwxMC4wMTgsMCwwLDAsNy4wNjQtMi45NSw5LjkyNyw5LjkyNywwLDAsMCwyLjg5LTcuMDY0di00LjRoMS43MWwtLjAwNyw0LjM5MkExMS42MjUsMTEuNjI1LDAsMCwxLDIwLjA0Nyw0MS41YTExLjcyMywxMS43MjMsMCwwLDEtOC4yNjUsMy40NTdabS0uMDItMy42aC0uMDQ3YTguMDU4LDguMDU4LDAsMCwxLS4wNDUtMTYuMTE1aDQuNTE0djEuN2gtNC41MUE2LjM1Niw2LjM1NiwwLDEsMCwxMS43LDM5LjY1MWguMDU4QTYuMzg5LDYuMzg5LDAsMCwwLDE4LjEsMzMuMjU5VjI1LjIzOGgxLjcxVjMzLjNhOC4wODYsOC4wODYsMCwwLDEtOC4wNSw4LjA1M1ptLS4wNS0zLjZoMGE0LjQ1NSw0LjQ1NSwwLDEsMSwwLTguOTA5aC44NTd2MS43aC0uODUxYTIuNzQ4LDIuNzQ4LDAsMSwwLDIuNzU3LDIuNzUyVjI4Ljg0MWgxLjcwOXY0LjQ1M2E0LjQ3LDQuNDcsMCwwLDEtNC40NzIsNC40NTZaTTM0LjI5MSwzMC41NEgyNS4zNHYtMS43aDguOTUxdjEuN1ptMy42MTgtMy42SDIxLjcyMXYtMS43SDM3LjkwOXYxLjdabS0xOC4xLTcuMjIxSDE4LjFWMTEuNjUxQTguMDc1LDguMDc1LDAsMCwxLDI2LjE4MiwzLjZoLjAxMmE4LjA1Nyw4LjA1NywwLDAsMSwuMDU0LDE2LjExNUgyMS43MjF2LTEuN2g0LjUyMkE2LjM1Niw2LjM1NiwwLDEsMCwyNi4yMjMsNS4zaC0uMDU4QTYuNCw2LjQsMCwwLDAsMTkuODEyLDExLjd2OC4wMlptLTMuNjI3LDBIMHYtMS43bDE2LjE4NSwwdjEuN1ptNy4yNDUtMy42SDIxLjcyMVYxMS42NjFhNC40NzUsNC40NzUsMCwwLDEsOC45NTEsMEE0LjQ2Niw0LjQ2NiwwLDAsMSwyNi4yLDE2LjExNUgyNS4zNHYtMS43SDI2LjJhMi43NTMsMi43NTMsMCwxLDAtMi43NjgtMi43NTJ2NC40NTRabS0xMC44NiwwSDMuNjJ2LTEuN2g4Ljk1djEuN1oiLz48cGF0aCBjbGFzcz0iYiIgZD0iTS4wMDUsMEgxLjk3NVYxMC42SDYuMzIydjEuNzY3SDBaIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg0Ni45NzEgNy44MTMpIi8+PHBhdGggY2xhc3M9ImIiIGQ9Ik0yLjE4NiwxMi43SC4yNTNWMy40ODJIMi4xODZWMTIuN1pNMS4yMTEsMi40MTFBMS4yMSwxLjIxLDAsMCwxLDAsMS4yMDUsMS4yLDEuMiwwLDAsMSwxLjIsMGguMDEzYTEuMjA2LDEuMjA2LDAsMSwxLDAsMi40MTFaIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg1NC4wMzMgNy40NzcpIi8+PHBhdGggY2xhc3M9ImIiIGQ9Ik00LjUsMTIuODQ1YTcuMTM1LDcuMTM1LDAsMCwxLTMuMzUzLS44ODRsLjYzLTEuNDg0YTUuODg5LDUuODg5LDAsMCwwLDIuNzE2LjcwN2MxLjA4NiwwLDIuOTA5LS4zLDIuOTA5LTIuMzE0VjguMjUxYTMuNTgxLDMuNTgxLDAsMCwxLTIuOTU5LDEuNDNBNC4yMjIsNC4yMjIsMCwwLDEsMS4yMjEsOC4zMyw1LjAzOSw1LjAzOSwwLDAsMSwwLDQuODYsNS4xMjgsNS4xMjgsMCwwLDEsMS4yNDgsMS4zNyw0LjI4OSw0LjI4OSwwLDAsMSw0LjQ2MywwLDMuNjgxLDMuNjgxLDAsMCwxLDcuNDgxLDEuNDczVi4yM0g5LjMwNnY4YTQuNDQyLDQuNDQyLDAsMCwxLTEuMzkzLDMuNkE1LjIyMSw1LjIyMSwwLDAsMSw0LjUsMTIuODQ1Wk00LjY4LDEuNzE0QTIuODI4LDIuODI4LDAsMCwwLDEuOTI5LDQuODQxLDIuODM1LDIuODM1LDAsMCwwLDQuNyw3Ljk2OWEyLjU2MSwyLjU2MSwwLDAsMCwyLS44ODEsMy4zNzEsMy4zNzEsMCwwLDAsLjc1LTIuMjQ3QTIuODM1LDIuODM1LDAsMCwwLDQuNjgsMS43MTRaIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg1Ny40MTQgMTAuNzI4KSIvPjxwYXRoIGNsYXNzPSJiIiBkPSJNNy43NTIsNy4yMjd2NS41NDdINS44MzVWNy4wNjdBMS44MjUsMS44MjUsMCwwLDAsMy45NzIsNS4wNTgsMi4wMDUsMi4wMDUsMCwwLDAsMS45MzIsNy4yMTV2NS41NjVIMFYwSDEuOTM0VjQuNzUzQTIuOTg5LDIuOTg5LDAsMCwxLDQuNTIyLDMuMzIxQzYuOTE4LDMuMzIxLDcuNzUyLDUuMjEzLDcuNzUyLDcuMjI3WiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNjguMTk5IDcuNDA2KSIvPjxwYXRoIGNsYXNzPSJiIiBkPSJNMS4wMywwSDIuOTQ2VjEuOTI2SDQuODI5djEuNTlIMi45NDZWNy44MDljMCwxLjQzLjU1LDEuNzQ5LDEuNTc5LDEuNzQ5LjE2LDAsLjM3My0uMDE5LjM3My0uMDE5VjExLjJhNS4wMzYsNS4wMzYsMCwwLDEtLjk0Mi4wNzFjLTIuMjUzLDAtMi45MjctMS41LTIuOTI3LTMuNzYzVjMuNTE2SDBWMS45MjZIMS4wMjlaIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg3Ni43ODMgOS4wMzIpIi8+PHBhdGggY2xhc3M9ImIiIGQ9Ik0xLjIwNyw2Ljg4N0EyLjUyOSwyLjUyOSwwLDAsMCwzLjQyNSw4LjA5MmMuODE3LDAsMS40MTktLjQsMS40MTktMS4xNDhDNC44NDQsNS4xNzguMzM4LDUuODEzLjMzOCwyLjYxNi4zMzguOTksMS43MjIsMCwzLjUxNCwwQTMuMjQxLDMuMjQxLDAsMCwxLDYuNTI5LDEuNzE0TDUuMiwyLjZBMiwyLDAsMCwwLDMuNDA3LDEuNTcyYy0uNzEsMC0xLjI0My4zNzItMS4yNDMsMS4wMDcsMCwxLjc2OCw0LjUyNSwxLjAyNiw0LjUyNSw0LjI3NiwwLDEuNzEzLTEuNDU1LDIuODI2LTMuMzUzLDIuODI2QTMuNTg4LDMuNTg4LDAsMCwxLDAsNy44NDRaIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg4Mi4zNTIgMTAuNzMyKSIvPjxwYXRoIGNsYXNzPSJiIiBkPSJNMS45MzQsMTIuNzU1SDBWLjIzSDEuODI4VjEuNDVBMy42ODUsMy42ODUsMCwwLDEsNC43NDksMGguMDZBNC40LDQuNCwwLDAsMSw4LjA2MywxLjM1Nyw1LjAxNSw1LjAxNSwwLDAsMSw5LjMzNCw0LjgyMmE1LjEzLDUuMTMsMCwwLDEtMS4yMDksMy41QTQuMTU4LDQuMTU4LDAsMCwxLDQuOTMzLDkuNjhhMy42MzgsMy42MzgsMCwwLDEtMy0xLjQ0OHY0LjUyMlptMi42OC0xMS4wNEEyLjU0OCwyLjU0OCwwLDAsMCwyLjYsMi42MzNhMy40LDMuNCwwLDAsMC0uNzM2LDIuMTkyYzAsMS44ODEsMS4xMTMsMy4xNDUsMi43NjgsMy4xNDVhMi44MzgsMi44MzgsMCwwLDAsMi43NS0zLjE0NUEyLjgyNSwyLjgyNSwwLDAsMCw0LjYxNCwxLjcxNVoiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDg5Ljk2NCAxMC43MjcpIi8+PHBhdGggY2xhc3M9ImIiIGQ9Ik00LjgwOCw5LjY3NUE0Ljc2Niw0Ljc2NiwwLDAsMSwxLjMxOSw4LjMyMSw0Ljg1Miw0Ljg1MiwwLDAsMSwwLDQuODcsNS4wNjYsNS4wNjYsMCwwLDEsMS4zLDEuMzY0LDQuMzQ2LDQuMzQ2LDAsMCwxLDQuNSwwQzcuMjUyLDAsOC45NTksMS44NDcsOC45NTksNC44MjFhNC40NTUsNC40NTUsMCwwLDEtLjAxNy40NzdIMS45NjhBMi42OCwyLjY4LDAsMCwwLDQuODQzLDhoLjA3OEEzLjAxOSwzLjAxOSwwLDAsMCw3LjQsNi43MTFsMS4yNzguOTU1QTQuMzc0LDQuMzc0LDAsMCwxLDQuODA4LDkuNjc1Wk00LjUyMywxLjYwOEEyLjQzNiwyLjQzNiwwLDAsMCwyLjAzOSwzLjk3Nmg0Ljk1QTIuMzM4LDIuMzM4LDAsMCwwLDQuNTIzLDEuNjA4WiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTAwLjExNyAxMC43MjgpIi8+PHBhdGggY2xhc3M9ImIiIGQ9Ik00LjgwOSw5LjY3NUE0Ljc2Nyw0Ljc2NywwLDAsMSwxLjMyLDguMzIxLDQuODUxLDQuODUxLDAsMCwxLDAsNC44Nyw1LjA2OCw1LjA2OCwwLDAsMSwxLjMsMS4zNjQsNC4zNDksNC4zNDksMCwwLDEsNC41MDcsMEM3LjI1NSwwLDguOTYxLDEuODQ3LDguOTYxLDQuODIxYTQuNDU1LDQuNDU1LDAsMCwxLS4wMTcuNDc3SDEuOTY5QTIuNjgxLDIuNjgxLDAsMCwwLDQuODQ0LDhoLjA3NkEzLjAyNSwzLjAyNSwwLDAsMCw3LjQsNi43MTFsMS4yNzguOTU1QTQuMzc1LDQuMzc1LDAsMCwxLDQuODA5LDkuNjc1Wk00LjUyNSwxLjYwOEEyLjQ0LDIuNDQsMCwwLDAsMi4wNCwzLjk3Nkg2Ljk5MkEyLjMzOCwyLjMzOCwwLDAsMCw0LjUyNSwxLjYwOFoiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEwOS44NiAxMC43MjgpIi8+PHBhdGggY2xhc3M9ImIiIGQ9Ik00LjU3NCwxM0g0LjUyNWE0LjQsNC40LDAsMCwxLTMuMjU0LTEuMzUxQTUuMDE2LDUuMDE2LDAsMCwxLDAsOC4xNzcsNS4yLDUuMiwwLDAsMSwxLjIwOSw0LjY4OSw0LjE1MSw0LjE1MSwwLDAsMSw0LjQsMy4zMjFhMy41NjQsMy41NjQsMCwwLDEsMywxLjQ3M1YwSDkuMzM0VjEyLjc3NEg3LjUwNlYxMS41NjlBMy43NDQsMy43NDQsMCwwLDEsNC41NzQsMTNaTTQuNyw1LjAzNmMtMS42MTksMC0yLjc1LDEuMy0yLjc1LDMuMTYzYTIuODI1LDIuODI1LDAsMCwwLDIuNzY4LDMuMTA5LDIuNTQ3LDIuNTQ3LDAsMCwwLDIuMDE0LS45MTlBMy40LDMuNCwwLDAsMCw3LjQ3MSw4LjJDNy40NzEsNi4zMDYsNi4zNTgsNS4wMzYsNC43LDUuMDM2WiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTE5LjU5NiA3LjQwNikiLz48cGF0aCBjbGFzcz0iYiIgZD0iTTEuNjY4LDkuMjU3QTIuNSwyLjUsMCwwLDAsNC4xLDExLjAwNiwxLjY0OCwxLjY0OCwwLDAsMCw1Ljk2Miw5LjM0NkM1Ljk2Miw2LjczMS4zNzMsNy4zMTQuMzczLDMuMzM5LjM3MywxLjQxMywxLjgwOSwwLDQuMSwwQTMuNzU4LDMuNzU4LDAsMCwxLDcuNzcxLDIuNTI2bC0xLjYzMi43MjlBMi4yMzksMi4yMzksMCwwLDAsNC4wNjIsMS44MDVhMS41MzYsMS41MzYsMCwwLDAtMS43MiwxLjUyYzAsMi40MzgsNS42MjQsMiw1LjYyNCw1Ljg4MywwLDIuMDY3LTEuNTA4LDMuNjE2LTMuOTU2LDMuNjE2QTQuMDM3LDQuMDM3LDAsMCwxLDAsMTAuMDM0WiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNDYuMTc5IDI1LjAwNCkiLz48cGF0aCBjbGFzcz0iYiIgZD0iTTIuMzU5LDEyLjM4OCwzLjY3Miw5LjA2NywwLDBIMi4wNzZsMi41LDYuNzExTDcuMDM4LDBIOS4wNTZMNC4yMTMsMTIuMzg2WiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNTQuMjcxIDI4LjM3NSkiLz48cGF0aCBjbGFzcz0iYiIgZD0iTTEuMiw2Ljg4N0EyLjUzNCwyLjUzNCwwLDAsMCwzLjQyMSw4LjA5MmMuODE3LDAsMS40MTktLjQsMS40MTktMS4xNDlDNC44NCw1LjE3Ni4zMzQsNS44MTMuMzM0LDIuNjE0LjMzNC45OSwxLjcxOCwwLDMuNTA5LDBBMy4yNDUsMy4yNDUsMCwwLDEsNi41MjcsMS43MTRMNS4xOTUsMi42QTIsMiwwLDAsMCwzLjQsMS41NzJjLS43MSwwLTEuMjQyLjM3MS0xLjI0MiwxLjAwNywwLDEuNzY3LDQuNTI0LDEuMDI1LDQuNTI0LDQuMjc1LDAsMS43MTQtMS40NTQsMi44MjctMy4zNTMsMi44MjdBMy41NjQsMy41NjQsMCwwLDEsMCw3Ljg0WiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNjMuMzU3IDI4LjE1MykiLz48cGF0aCBjbGFzcz0iYiIgZD0iTTEuMDMsMEgyLjk0N1YxLjkyNUg0LjgzVjMuNTE2SDIuOTQ3VjcuOGMwLDEuNDMyLjU1LDEuNzQ5LDEuNTc5LDEuNzQ5LjE2LDAsLjM3My0uMDE3LjM3My0uMDE3djEuNjYxYTUuMDM2LDUuMDM2LDAsMCwxLS45NDIuMDcxYy0yLjI1MywwLTIuOTI4LTEuNS0yLjkyOC0zLjc2M1YzLjUxNkgwVjEuOTI1SDEuMDI5WiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNzAuNTIgMjYuNDU0KSIvPjxwYXRoIGNsYXNzPSJiIiBkPSJNNC44MDksOS42NzVBNC43NjcsNC43NjcsMCwwLDEsMS4zMiw4LjMyMSw0Ljg1MSw0Ljg1MSwwLDAsMSwwLDQuODcsNS4wNjgsNS4wNjgsMCwwLDEsMS4zLDEuMzY0LDQuMzQ5LDQuMzQ5LDAsMCwxLDQuNTA3LDBDNy4yNTUsMCw4Ljk2MSwxLjg0Nyw4Ljk2MSw0LjgyMWE0LjQ1NSw0LjQ1NSwwLDAsMS0uMDE3LjQ3N0gxLjk2OUEyLjY4MiwyLjY4MiwwLDAsMCw0Ljg0NCw4aC4wNzZBMy4wMjcsMy4wMjcsMCwwLDAsNy40LDYuNzEybDEuMjc4Ljk1NEE0LjM3NSw0LjM3NSwwLDAsMSw0LjgwOSw5LjY3NVpNNC41MjUsMS42MDdBMi40MzgsMi40MzgsMCwwLDAsMi4wNCwzLjk3NUg2Ljk5MmEyLjQ1OSwyLjQ1OSwwLDAsMC0uNzYxLTEuNzU0QTIuNDgsMi40OCwwLDAsMCw0LjUyNSwxLjYwN1oiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDc1Ljc1OCAyOC4xNDkpIi8+PHBhdGggY2xhc3M9ImIiIGQ9Ik0xMy4wNzgsOS40NDlIMTEuMTYxVjMuOTJjMC0xLjQzMi0uNjItMi4xOTEtMS43NzQtMi4xOTFDOC4zMSwxLjcyOSw3LjUsMi41MjMsNy41LDMuOTM4VjkuNDQ5SDUuNTcyVjMuNzQzYzAtMS4yNTUtLjY3My0yLjAwOS0xLjc3NC0yLjAwOUExLjk1LDEuOTUsMCwwLDAsMS45MzQsMy45MDdWOS40NTRIMFYuMjI2SDEuODkzVjEuNDMyQTIuNzU2LDIuNzU2LDAsMCwxLDQuMzk1LDAsMi43NywyLjc3LDAsMCwxLDcuMDU3LDEuNTM4LDMuMTQyLDMuMTQyLDAsMCwxLDkuOTE0LDBjMi4wOTQsMCwzLjE1OCwxLjQzMiwzLjE1OCwzLjQyN1oiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDg1LjY3NyAyOC4xNTIpIi8+PHBhdGggY2xhc3M9ImIiIGQ9Ik0xLjIwNyw2Ljg4N0EyLjUzNCwyLjUzNCwwLDAsMCwzLjQyNSw4LjA5MmMuODE3LDAsMS40Mi0uNCwxLjQyLTEuMTQ5LDAtMS43NjctNC41MDgtMS4xMy00LjUwOC00LjMyOUMuMzM4Ljk5LDEuNzIyLDAsMy41MTQsMEEzLjI0NSwzLjI0NSwwLDAsMSw2LjUzMSwxLjcxNEw1LjIsMi42QTIsMiwwLDAsMCwzLjQwNywxLjU3MmMtLjcxLDAtMS4yNDIuMzcxLTEuMjQyLDEuMDA3LDAsMS43NjcsNC41MjQsMS4wMjUsNC41MjQsNC4yNzUsMCwxLjcxNC0xLjQ1NCwyLjgyNy0zLjM1MywyLjgyN0EzLjU4NiwzLjU4NiwwLDAsMSwwLDcuODQ0WiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoOTkuODQgMjguMTUzKSIvPjwvc3ZnPg==", "fortiguard": "data:image/svg+xml;base64,PHN2ZyBpZD0iU2VjdXJpdHlfTmV0d29ya2luZyIgZGF0YS1uYW1lPSJTZWN1cml0eSBOZXR3b3JraW5nIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj4KICA8ZGVmcz4KICAgIDxzdHlsZT4KICAgICAgLmNscy0xIHsKICAgICAgICBmaWxsOiAjNDY0NjQ2OwogICAgICB9CgogICAgICAuY2xzLTEsIC5jbHMtMiwgLmNscy0zIHsKICAgICAgICBzdHJva2Utd2lkdGg6IDBweDsKICAgICAgfQoKICAgICAgLmNscy0yIHsKICAgICAgICBmaWxsOiAjM2NiMTdlOwogICAgICB9CgogICAgICAuY2xzLTMgewogICAgICAgIGZpbGw6ICNmZmY7CiAgICAgIH0KICAgIDwvc3R5bGU+CiAgPC9kZWZzPgogIDxnPgogICAgPHBhdGggY2xhc3M9ImNscy0yIiBkPSJtOTYuMDQsMTc3Ljk3bC0xLjc1LS44NGMtMjUuMTUtMTIuMDktMzcuMjgtMTguOTctNDcuMzMtMzAuMzktOC41NC05LjctMTMuNjMtMjMuNjUtMTMuNjMtMzcuM1YzMy41N2wzLjcyLS4yOWMyMC4zMS0xLjYyLDM5LjQ2LTcuNjksNTYuOTItMTguMDJsMi4wNi0xLjIyLDIuMDYsMS4yMmMxNy4yMSwxMC4xOSwzNi44OSwxNi40Myw1Ni45MiwxOC4wMmwzLjcyLjI5djc1Ljg4YzAsMTMuNjUtNS4xLDI3LjYxLTEzLjYzLDM3LjMtMTAuMDUsMTEuNDItMjIuMTgsMTguMy00Ny4zMiwzMC4zOWwtMS43NS44NFoiLz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0ibTk2LjA0LDE3OS45N2MtLjMsMC0uNTktLjA3LS44Ny0uMmwtMS43NS0uODRjLTI1LjQxLTEyLjIxLTM3LjY5LTE5LjItNDcuOTYtMzAuODctOC44NS0xMC4wNS0xNC4xMy0yNC40OS0xNC4xMy0zOC42MlYzMy41N2MwLTEuMDQuOC0xLjkxLDEuODQtMS45OWwzLjcyLS4yOWMxOS45OS0xLjU5LDM4Ljg1LTcuNTcsNTYuMDYtMTcuNzVsMi4wNi0xLjIyYy42My0uMzcsMS40MS0uMzcsMi4wNCwwbDIuMDYsMS4yMmMxNi45NiwxMC4wNCwzNi4zNSwxNi4xOCw1Ni4wNiwxNy43NWwzLjcyLjI5YzEuMDQuMDgsMS44NC45NSwxLjg0LDEuOTl2NzUuODhjMCwxNC4xNC01LjI4LDI4LjU4LTE0LjEzLDM4LjYyLTEwLjI2LDExLjY2LTIyLjU0LDE4LjY1LTQ3Ljk1LDMwLjg3bC0xLjc1Ljg0Yy0uMjcuMTMtLjU3LjItLjg3LjJaTTM1LjMzLDM1LjQydjc0LjAzYzAsMTMuMTksNC45MSwyNi42NCwxMy4xMywzNS45OCw5LjgsMTEuMTQsMjEuNzksMTcuOTQsNDYuNjksMjkuOTFsLjg4LjQzLjg4LS40M2MyNC45LTExLjk3LDM2Ljg4LTE4Ljc3LDQ2LjY5LTI5LjkxLDguMjMtOS4zMywxMy4xNC0yMi43OCwxMy4xNC0zNS45OFYzNS40MmwtMS44Ny0uMTVjLTIwLjMyLTEuNjItNDAuMy03Ljk0LTU3Ljc5LTE4LjNsLTEuMDQtLjYyLTEuMDQuNjJjLTE3Ljc0LDEwLjUtMzcuMTgsMTYuNjYtNTcuNzksMTguM2wtMS44OC4xNVoiLz4KICA8L2c+CiAgPGc+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTMiIHBvaW50cz0iMTMzLjA5IDgzLjc0IDEzMy4wOSA4My43NCAxMTIuMjEgODMuNzQgMTEyLjIxIDgzLjc0IDExMi4yMSA5Ny4xNyAxMzMuMDkgOTcuMTcgMTMzLjEgOTcuMTcgMTMzLjEgODMuNzQgMTMzLjA5IDgzLjc0Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTMiIHBvaW50cz0iODUuNTkgMTE2LjMyIDg1LjU5IDExNi4zMiAxMDYuNDggMTE2LjMyIDEwNi40OCAxMTYuMzIgMTA2LjQ4IDEwMi45IDg1LjU5IDEwMi45IDg1LjU5IDExNi4zMiIvPgogICAgPHBhdGggY2xhc3M9ImNscy0zIiBkPSJtMTMzLjA5LDc1LjgzYzAtNi4yMS01LjA0LTExLjI1LTExLjI1LTExLjI1aC05LjYzdjEzLjQzaDIwLjg4di0yLjE4WiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy0zIiBwb2ludHM9Ijg1LjU5IDY0LjU5IDg1LjU5IDc4LjAxIDg1LjU5IDc4LjAxIDEwNi40OCA3OC4wMSAxMDYuNDggNzguMDEgMTA2LjQ4IDY0LjU5IDEwNi40OCA2NC41OCA4NS41OSA2NC41OCA4NS41OSA2NC41OSIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy0zIiBwb2ludHM9IjU4Ljk4IDgzLjc0IDU4Ljk4IDgzLjc0IDU4Ljk4IDk3LjE3IDU4Ljk4IDk3LjE3IDc5Ljg2IDk3LjE3IDc5Ljg2IDgzLjc0IDc5Ljg2IDgzLjc0IDU4Ljk4IDgzLjc0IDU4Ljk4IDgzLjc0Ii8+CiAgICA8cGF0aCBjbGFzcz0iY2xzLTMiIGQ9Im0xMTIuMjEsMTE2LjMyaDkuNjNjNi4yMSwwLDExLjI1LTUuMDQsMTEuMjUtMTEuMjV2LTIuMTdoLTIwLjg4djEzLjQyWiIvPgogICAgPHBhdGggY2xhc3M9ImNscy0zIiBkPSJtNTguOTgsMTA1LjA3YzAsNi4yMSw1LjA0LDExLjI1LDExLjI1LDExLjI1aDkuNjNzMC0xMy40MiwwLTEzLjQyaC0yMC44OXYyLjE3WiIvPgogICAgPHBhdGggY2xhc3M9ImNscy0zIiBkPSJtNTguOTgsNzUuODR2Mi4xOGgyMC44OXYtMTMuNDNoLTkuNjNjLTYuMjEsMC0xMS4yNSw1LjA0LTExLjI1LDExLjI1WiIvPgogIDwvZz4KPC9zdmc+", "cisco": "data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCIKCSB2aWV3Qm94PSIwIDAgODQgNDMiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDg0IDQzOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+CjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+Cgkuc3Qwe2ZpbGw6IzFCQTlERjt9Cjwvc3R5bGU+CjxnPgoJPHBhdGggY2xhc3M9InN0MCIgZD0iTTM0LDM2LjlsMCwyLjhsMC4yLDBjMC42LDAuMSwxLjMsMC4yLDEuOSwwLjJjMC42LDAuMSwxLjEsMC4xLDEuNywwYzAuNSwwLDEuMS0wLjEsMS42LTAuMwoJCWMwLjYtMC4yLDEuMi0wLjUsMS43LTAuOWMwLjQtMC40LDAuOC0wLjksMS0xLjRjMC40LTAuOSwwLjMtMS45LDAtMi44Yy0wLjItMC41LTAuNS0wLjktMC45LTEuMmMtMC40LTAuMy0wLjgtMC42LTEuMy0wLjcKCQlsLTIuMS0wLjhjLTAuMy0wLjEtMC41LTAuMy0wLjYtMC41Yy0wLjEtMC4yLTAuMS0wLjQsMC0wLjZjMC0wLjEsMC4xLTAuMSwwLjEtMC4yYzAuMS0wLjEsMC4xLTAuMSwwLjItMC4yYzAsMCwwLjEsMCwwLjEtMC4xCgkJYzAuMi0wLjEsMC41LTAuMiwwLjgtMC4yYzAuNC0wLjEsMC45LTAuMSwxLjMsMGMwLjUsMC4xLDEuMSwwLjEsMS42LDAuM2wwLjEsMHYtMi42bC0wLjIsMGMtMC41LTAuMS0xLjEtMC4yLTEuNi0wLjMKCQljLTAuNy0wLjEtMS40LTAuMS0yLjEsMGMtMC45LDAuMS0xLjcsMC40LTIuNCwxYy0wLjUsMC40LTAuOCwwLjktMSwxLjRjLTAuMywwLjgtMC4zLDEuOCwwLDIuNmMwLjIsMC40LDAuNCwwLjgsMC43LDEuMQoJCWMwLjMsMC4zLDAuNiwwLjUsMSwwLjdjMC41LDAuMiwwLjksMC40LDEuNSwwLjZjMC4yLDAsMC4zLDAuMSwwLjUsMC4ybDAuMiwwLjFjMCwwLDAsMCwwLjEsMGMwLjIsMC4xLDAuNSwwLjIsMC43LDAuNAoJCWMwLjEsMC4xLDAuMiwwLjMsMC4zLDAuNGMwLDAuMiwwLDAuMywwLDAuNWMtMC4xLDAuMi0wLjMsMC41LTAuNSwwLjZjLTAuMywwLjEtMC41LDAuMi0wLjgsMC4yYy0wLjQsMC4xLTAuOCwwLjEtMS4yLDAuMQoJCWMtMC41LDAtMS4xLTAuMS0xLjYtMC4yYy0wLjMtMC4xLTAuNi0wLjEtMC44LTAuMkwzNCwzNi45Ii8+Cgk8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjIuNSwzOS42di0zLjNsLTAuMSwwYy0wLjcsMC40LTEuNSwwLjYtMi4zLDAuNmMtMC44LDAuMS0xLjctMC4yLTIuNC0wLjdjLTAuNS0wLjQtMC44LTAuOS0xLTEuNQoJCWMtMC4yLTAuNi0wLjItMS4zLTAuMS0xLjljMC4xLTAuNywwLjUtMS4yLDEtMS43YzAuNS0wLjQsMS0wLjYsMS42LTAuN2MxLjEtMC4xLDIuMSwwLjEsMy4xLDAuNmwwLjEsMHYtMy4zbC0wLjEsMAoJCWMtMS0wLjMtMi0wLjQtMy0wLjRjLTAuOSwwLTEuOCwwLjItMi42LDAuNmMtMC44LDAuNC0xLjYsMS0yLjIsMS43Yy0xLjgsMi4zLTEuOSw1LjYtMC4xLDcuOWMwLjksMS4xLDIuMSwxLjksMy40LDIuMgoJCWMxLjQsMC4zLDIuOSwwLjMsNC4zLTAuMkwyMi41LDM5LjYiLz4KCTxwb2x5bGluZSBjbGFzcz0ic3QwIiBwb2ludHM9IjI5LjgsMzkuOCAyOS44LDI3LjYgMjYuOCwyNy42IDI2LjgsMzkuOCAyOS44LDM5LjggCSIvPgoJPHBhdGggY2xhc3M9InN0MCIgZD0iTTYuOSwxNy44YzAsMC40LDAuMiwwLjcsMC41LDFjMC4zLDAuMywwLjcsMC40LDEsMC40YzAuNCwwLDAuOC0wLjEsMS0wLjRjMC4zLTAuMywwLjUtMC42LDAuNS0xdi0zLjQKCQljMC0wLjQtMC4yLTAuOC0wLjUtMUM5LjIsMTMuMSw4LjgsMTMsOC40LDEzcy0wLjgsMC4yLTEuMSwwLjRjLTAuMywwLjMtMC41LDAuNi0wLjUsMUw2LjksMTcuOCIvPgoJPHBhdGggY2xhc3M9InN0MCIgZD0iTTE1LjMsMTcuOGMwLDAuNCwwLjIsMC43LDAuNSwxYzAuMywwLjMsMC43LDAuNCwxLDAuNGMwLjQsMCwwLjgtMC4xLDEtMC40YzAuMy0wLjMsMC41LTAuNiwwLjUtMXYtNy42CgkJYzAtMC40LTAuMi0wLjgtMC41LTFjLTAuMy0wLjMtMC43LTAuNC0xLjEtMC40cy0wLjgsMC4yLTEuMSwwLjRjLTAuMywwLjMtMC41LDAuNi0wLjUsMVYxNy44Ii8+Cgk8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjMuNywyMC44YzAsMC40LDAuMiwwLjcsMC41LDFjMC4zLDAuMywwLjcsMC40LDEsMC40YzAuNCwwLDAuOC0wLjEsMS0wLjRjMC4zLTAuMywwLjUtMC42LDAuNS0xVjQuNQoJCWMwLTAuNC0wLjItMC44LTAuNS0xQzI2LDMuMiwyNS42LDMsMjUuMiwzYy0wLjQsMC0wLjgsMC4yLTEuMSwwLjRjLTAuMywwLjMtMC40LDAuNi0wLjUsMVYyMC44Ii8+Cgk8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMzIuMSwxNy44YzAsMC40LDAuMiwwLjcsMC41LDFjMC4zLDAuMywwLjcsMC40LDEsMC40YzAuNCwwLDAuOC0wLjEsMS0wLjRjMC4zLTAuMywwLjUtMC42LDAuNS0xdi03LjYKCQljMC0wLjQtMC4yLTAuOC0wLjUtMWMtMC4zLTAuMy0wLjctMC40LTEuMS0wLjRzLTAuOCwwLjItMS4xLDAuNGMtMC4zLDAuMy0wLjUsMC42LTAuNSwxTDMyLjEsMTcuOCIvPgoJPHBhdGggY2xhc3M9InN0MCIgZD0iTTQwLjUsMTcuOGMwLDAuNCwwLjIsMC43LDAuNSwxYzAuMywwLjMsMC43LDAuNCwxLDAuNGMwLjQsMCwwLjgtMC4xLDEtMC40YzAuMy0wLjMsMC41LTAuNiwwLjUtMXYtMy40CgkJYzAtMC40LTAuMi0wLjgtMC41LTFDNDIuOCwxMy4xLDQyLjQsMTMsNDIsMTNjLTAuNCwwLTAuOCwwLjItMS4xLDAuNGMtMC4zLDAuMy0wLjUsMC42LTAuNSwxTDQwLjUsMTcuOCIvPgoJPHBhdGggY2xhc3M9InN0MCIgZD0iTTQ4LjksMTcuOGMwLDAuNCwwLjIsMC43LDAuNSwxYzAuMywwLjMsMC43LDAuNCwxLDAuNHMwLjgtMC4xLDEtMC40YzAuMy0wLjMsMC41LTAuNiwwLjUtMXYtNy42CgkJYzAtMC40LTAuMi0wLjgtMC41LTFjLTAuMy0wLjMtMC43LTAuNC0xLjEtMC40Yy0wLjQsMC0wLjgsMC4yLTEuMSwwLjRjLTAuMywwLjMtMC41LDAuNi0wLjUsMUw0OC45LDE3LjgiLz4KCTxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik01Ny4zLDIwLjhjMCwwLjQsMC4yLDAuNywwLjUsMWMwLjMsMC4zLDAuNywwLjQsMSwwLjRjMC40LDAsMC44LTAuMSwxLTAuNGMwLjMtMC4zLDAuNS0wLjYsMC41LTFWNC41CgkJYzAtMC40LTAuMi0wLjgtMC41LTFDNTkuNiwzLjIsNTkuMiwzLDU4LjgsM2MtMC40LDAtMC44LDAuMi0xLjEsMC40Yy0wLjMsMC4zLTAuNSwwLjYtMC41LDFMNTcuMywyMC44Ii8+Cgk8cGF0aCBjbGFzcz0ic3QwIiBkPSJNNjUuNywxNy44YzAsMC40LDAuMiwwLjcsMC41LDFjMC4zLDAuMywwLjcsMC40LDEsMC40czAuOC0wLjEsMS0wLjRjMC4zLTAuMywwLjUtMC42LDAuNS0xdi03LjYKCQljMC0wLjQtMC4yLTAuOC0wLjUtMWMtMC4zLTAuMy0wLjctMC40LTEuMS0wLjRzLTAuOCwwLjItMS4xLDAuNGMtMC4zLDAuMy0wLjUsMC42LTAuNSwxTDY1LjcsMTcuOCIvPgoJPHBhdGggY2xhc3M9InN0MCIgZD0iTTc0LDE3LjhjMCwwLjQsMC4yLDAuNywwLjUsMWMwLjMsMC4zLDAuNywwLjQsMSwwLjRzMC44LTAuMSwxLTAuNGMwLjMtMC4zLDAuNS0wLjYsMC41LTF2LTMuNAoJCWMwLTAuNC0wLjItMC44LTAuNS0xQzc2LjMsMTMuMSw3NiwxMyw3NS42LDEzYy0wLjQsMC0wLjgsMC4yLTEuMSwwLjRjLTAuMywwLjMtMC40LDAuNi0wLjUsMUw3NCwxNy44Ii8+Cgk8cGF0aCBjbGFzcz0ic3QwIiBkPSJNNTQuNiwzOS42di0zLjNsLTAuMSwwYy0wLjcsMC40LTEuNSwwLjYtMi4zLDAuNmMtMC44LDAuMS0xLjctMC4yLTIuNC0wLjdjLTAuNS0wLjQtMC44LTAuOS0xLTEuNQoJCWMtMC4yLTAuNi0wLjItMS4zLTAuMS0xLjljMC4xLTAuNywwLjUtMS4yLDEtMS43YzAuNS0wLjQsMS0wLjYsMS42LTAuN2MxLjEtMC4xLDIuMSwwLjEsMy4xLDAuNmwwLjEsMHYtMy4zbC0wLjEsMAoJCWMtMS0wLjMtMi0wLjQtMy0wLjRjLTAuOSwwLTEuOCwwLjItMi42LDAuNmMtMC44LDAuNC0xLjYsMS0yLjIsMS43Yy0xLjgsMi4zLTEuOSw1LjYtMC4xLDcuOWMwLjksMS4xLDIuMSwxLjksMy40LDIuMgoJCWMxLjQsMC4zLDIuOSwwLjMsNC4zLTAuMkw1NC42LDM5LjYiLz4KCTxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik01Ny45LDMzLjdjMCwxLjksMC45LDMuNywyLjQsNC45YzEuNSwxLjIsMy41LDEuNiw1LjQsMS4yYzIuNi0wLjUsNC41LTIuNSw1LTUuMXMtMC43LTUuMS0yLjktNi41CgkJYy0yLTEuMi00LjQtMS4zLTYuNS0wLjJDNTkuMiwyOS4zLDU3LjksMzEuNCw1Ny45LDMzLjcgTTYyLjMsMzEuMmMwLjctMC41LDEuNS0wLjgsMi40LTAuN2MwLjgsMC4xLDEuNiwwLjUsMi4xLDEuMgoJCWMwLjUsMC43LDAuOCwxLjUsMC43LDIuNGMtMC4xLDAuOC0wLjUsMS42LTEuMiwyLjFjLTAuNywwLjUtMS41LDAuOC0yLjQsMC43Yy0wLjgtMC4xLTEuNi0wLjUtMi4xLTEuMmMtMC41LTAuNy0wLjgtMS41LTAuNy0yLjQKCQlDNjEuMiwzMi41LDYxLjcsMzEuNyw2Mi4zLDMxLjIiLz4KPC9nPgo8L3N2Zz4=", "securly": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNDkwIDM4OSI+PHBhdGggZD0iTTM0MS41MSA4OS4wOGMtLjYxLTYuOTItNS45My0xMi40OS0xMi44NC0xMy4xNi0xLjgxLS4xOS00NS44Ny00LjgtODMuMzYtMjYuNjMtMzcuMjctMjEuNy02MS4xNi00My4wMS02Mi4xNi00My45Mi01LjU4LTUuMS0xNC4yNC01LjIxLTE5LjcxIDAtLjIyLjItMjMuMSAyMS4wMi02Mi41NiA0NC4wMy0zOC40IDIyLjQtODIuMTYgMjYuNDMtODIuNTkgMjYuNDctNi45LjU0LTEyLjQ3IDUuOTItMTMuMjQgMTIuOC0uMjkgMi42NS0xLjYzIDMwLjYyLS45IDYyLjU3IDEuMDUgNDYuNCA2LjMgNzIuODEgMjEuMTggMTAyLjg5IDguOTkgMTguMTggMjguNzUgNDMuMSAzOS4xIDUzLjYzIDEzLjM0IDEzLjU3IDI2LjIzIDIzLjkyIDM0LjY2IDI5Ljc5IDYuNDggNC41MSAxMC42MyA2Ljg5IDExLjc1IDcuNSAzLjg3IDIuMTQgOS4yOSAyLjIzIDEzLjgxLjIxIDEuMDUtLjQ2IDQuNTMtMi4yNyA5LjgxLTUuMzMgNC4zNS0yLjUyIDExLjQ0LTYuNzcgMjAuNDktMTIuNzQgNC44OS0zLjIzIDkuODgtNi42NCAxNC44MS0xMC4xMiAyMy44LTE2LjgyIDU4LjYtNDUuNiA4MS40MS03NC4zIDIxLjExLTI2LjU2IDMzLjEzLTU1LjM0IDI3LjY2LTgzLjA1LTMuNjMtMTguNC0xMi40LTMxLjAyLTI2Ljg1LTQwLjc4LTEzLjMtOC45OS0zMS41NC0xMi4wOS00Ny4xNy04LTE1LjA4IDMuOTUtMjUuODMgMTIuNTctMzEuMzcgMTguMjctNS43NS01Ljk0LTI2Ljg4LTI1LjE4LTU4LjUxLTE4LjcxLTI4LjcxIDUuODctNTUuNTYgMzMuNTgtNDYuNCA3OS45MyAyLjc2IDEzLjk4IDkuODMgMjguODggMjEuMTQgNDMuNDcgOC4yMiAxMC42IDE4LjYzIDIwLjk5IDMwLjU4IDMxIDMuNSAyLjkzIDguMzggMy4wOCAxMi4yNS42NCAzLjc0LTIuMzYgNy44MS01LjE4IDExLjc3LTguMjEgMS41My0xLjE3IDIuNTgtMi45MiAyLjczLTQuODQuMTgtMi4xNy0uNjgtNC4yNS0yLjMzLTUuNjYtMTQuNjktMTIuNTYtNDEuNDEtMzYuNjgtNDcuMjEtNjEuNDYtNi40NS0yNy41OCAxMi41Mi00Mi45MyAyMy45OS00NS4xMSAxMS4yMi0yLjEzIDIxLjYzLS4yOSAzMS4wMSA2LjM5IDQuODcgMy40NyAxMC4xOCA4LjYgMTMuNzggMTIuMyAxLjg3IDEuOTIgNC40MyAzIDcuMTEgM2E5Ljg3IDkuODcgMCAwMDcuMDgtMi45OGMzLjMzLTMuNCA3LjU1LTcuNzUgMTMuNzEtMTIuMTcgMTIuODMtOS4yIDMwLjItMTAuMjkgNDIuODEtMS4yMSAyOS4xOSAyMS4wMiA2LjA1IDYxLjU0LTEwLjA5IDgwLjctMTAuNjQgMTIuNjMtMjYuMjcgMzEuMzQtNzMuNyA2Ni4wMy0xNS40NiAxMS4zMS0yOC42NCAxOC41Ny0zNS4zNyAyMi4yNC01LjQ3LTMuNDQtMTUuMy0xMS42Mi0yNy4xMy0yMy4wMS0yMS44MS0yMS00My45LTUwLjQ2LTUwLjkyLTg1LjkzLTguNzgtNDQuMzgtNi40MS0xMDIuMzctNi40MS0xMDIuMzdzNDQuOTYtNi44MyA4Mi4zNC0yOC4zMmMyNi4zMi0xNS4xNCA0NS43OC0zMC4xMSA1Ny43Ny00MC4wNiAwIDAgMzAuMDkgMjQuNjMgNTYuMzQgMzkuODUgMjMuMzEgMTMuNTEgNTIuNzUgMjMuMjcgODMuNDMgMjguNTQuNDIgOC42MiAxLjkzIDYyLjg4LTQuMTQgOTUuMDItOC40NyA0NC44OC0zNS43MiA4My4zNC05MC45NiAxMjUuMzktMTguNDQgMTQuMDQtNDYuNzkgMzIuNTMtNjIuNTkgNDIuMjItMy4zOSAyLjA4LTUuMzMgNi44MS0yLjY5IDEwLjQxLjQ0LjYgMS41NSAxLjYzIDIuMTQgMi4wNyA0Ljk2IDMuNzIgOC4zNiA2LjE4IDExLjg0IDcuOTcgNC41IDIuMzEgOS40MSAxLjEzIDEyLjg2LS44NyAxOS41OS0xMS4zNSAzNy45My0yMy43MyA1Ni4yNy0zNy43IDE5LjEyLTE0LjU1IDQxLjItMzIuNTggNjAuMDMtNTUuOSAyMy42OC0yOS4zMiAzNy4zOC01OS42NCA0MS45Mi04OC4xMyA3LjctNDguMjMgMy42Mi0xMTQuNjYgMy42Mi0xMTQuNjZ6IiBmaWxsPSIjMDA3M2U2Ii8+PHBhdGggZD0iTTQxNi41NyAyNjUuOTRjLTMuNjUtMS44My00LjAyLTQuNzUtMi4xOS04LjRsOS44Ni0xNy4xNmMyLjE5LTMuMjkgNS4xMS00LjAyIDguNC0xLjgzIDEyLjc4IDguNCAzMC4zMSAxNC45NyA1MS40OSAxNC45NyAxOC42MiAwIDI5Ljk0LTYuOTQgMjkuOTQtMTkuNzIgMC0xMS42OS04Ljc2LTE3LjUzLTM1LjQyLTI0LjEtMzIuODctOC4wMy01OS44OS0yMC44MS01OS44OS01MC43NiAwLTMwLjMxIDI2LjI5LTQ5LjY2IDY1LjczLTQ5LjY2IDI1LjIgMCA0NS4yOCA2LjU3IDU5LjUyIDE0Ljk3IDMuMjkgMS44MyA0LjAyIDQuNzUgMS44MyA4LjRsLTkuMTMgMTYuOGMtMS44MyAzLjI5LTQuNzUgNC4wMi04LjQgMS44My0xNC4yNC03LjY3LTI4LjEyLTEyLjA1LTQ1LjY1LTEyLjA1LTE1LjcgMC0yNy4wMiA1LjQ4LTI3LjAyIDE3Ljg5IDAgMTAuOTYgMTAuMjIgMTUuMzQgMzguNzEgMjIuMjggMzUuNDIgOS4xMyA1Ni42IDIxLjE4IDU2LjYgNTIuNTkgMCAzMC42Ny0yNi4yOSA1MS40OS02OS4wMiA1MS40OS0yNi4yOC0uMDItNDcuODMtNi45NS02NS4zNi0xNy41NHptMjM3Ljc4LTE1Ny4wM2MtNTAuNzYgMC04Ni4xOCAzNy45OC04Ni4xOCA4Ny4yOCAwIDUwLjAzIDM4LjM0IDg3LjI4IDkwLjU2IDg3LjI4IDMxLjA0IDAgNTAuNzYtOS40OSA2Mi44MS0xOC42MiAyLjkyLTIuNTYgMy4yOS01LjQ4IDEuNDYtOC43NmwtOS40OS0xNS43Yy0xLjgzLTMuNjUtNC43NS00LjAyLTguMDMtMS40Ni05Ljg2IDYuNTctMjIuNjQgMTMuODgtNDIuNzMgMTMuODgtMzEuNDEgMC01NC4wNS0xOS4zNS01OC40My00Ni4wMWgxMjQuNTJjMy42NSAwIDUuODQtMi4xOSA2LjIxLTYuMjF2LTUuODRjLjAxLTUwLjQyLTMyLjUtODUuODQtODAuNy04NS44NHptNDYuMDEgNzEuOTRoLTk1LjY4YzUuMTEtMjUuOTMgMjQuNDctNDIuMzYgNTAuNzYtNDIuMzYgMjMuNzQgMCA0Mi4zNiAxNi44IDQ0LjkyIDQxLjYzdi43M3ptNTUuODcgMTUuN2MwLTQ5LjY2IDM5LjgtODcuNjQgOTEuMjktODcuNjQgMjYuNjYgMCA0My4wOSA3LjMgNTQuNDEgMTQuNjEgMy4yOSAyLjU2IDQuMDIgNS40OCAxLjgzIDkuMTNsLTkuNDkgMTYuNDNjLTEuODMgMy4yOS01LjExIDMuNjUtOC40IDEuODMtOC40LTUuMTEtMTkuNzItOC43Ni0zNC4zMy04Ljc2LTM0LjY5IDAtNTguMDYgMjMuMDEtNTguMDYgNTQuNDEgMCAzMC42NyAyMy4zNyA1My42OCA1Ni42IDUzLjY4IDE2LjQzIDAgMjcuMDItMy42NSAzNS43OS04LjQgMy42NS0yLjE5IDYuMjEtMS40NiA3LjY3IDEuNDZsOS44NiAxNy41M2MxLjgzIDMuNjUgMS4xIDYuMjEtMi4xOSA4LjQtOC43NiA1LjQ4LTI1LjIgMTQuMjQtNTMuNjggMTQuMjQtNTQuMDUtLjAxLTkxLjMtMzcuOTgtOTEuMy04Ni45MnptNDY2LjcxLTgwLjM0bC0yLjE5IDIzLjM3Yy0uMzYgNC4zOC0yLjkyIDUuODQtNi45NCA1LjExLTIuNTYtLjczLTUuODQtMS4xLTkuNDktMS4xLTMxLjQgMC00Ny40NyAyMy4zNy00Ny44NCA0Ny4xMXY4My4yNmMwIDQuMDItMi4xOSA2LjIxLTYuMjEgNi4yMWgtMjQuMWMtMy42NSAwLTYuMjEtMi4xOS02LjIxLTYuMjFWMTE4LjQxYzAtNC4wMiAyLjU2LTYuMjEgNi4yMS02LjIxaDE4Ljk5YzMuNjUgMCA2LjIxIDIuMTkgNi4yMSA1Ljg0bDEuMSAyNy4wMmM2Ljk0LTE5LjcyIDI3LjAyLTM2LjE1IDU2Ljk3LTM2LjE1IDIuNTYgMCA1LjQ4IDAgOC4wMy4zNyA0LjAxLjM2IDUuODQgMy4yOCA1LjQ3IDYuOTN6bTI5LjM5IDE1Ny43NlYyNS42NWMwLTQuMDIgMi41Ni02LjIxIDYuMjEtNi4yMWgyNC4xYzQuMDIgMCA2LjIxIDIuMTkgNi4yMSA2LjIxdjI0OC4zMmMwIDQuMDItMi4xOSA2LjIxLTYuMjEgNi4yMWgtMjQuMWMtMy42NiAwLTYuMjEtMi4xOS02LjIxLTYuMjF6bTIzMy42OS0xNTQuNDdsLTYyLjA4IDE0Ny45LTMzLjIzIDc5LjI0Yy0xLjEgMi45Mi0zLjY1IDQuNzUtNi45NCA0Ljc1aC0yMy43NGMtNC4zOCAwLTYuNTctMi45Mi00Ljc1LTYuOTRsMjUuOTMtNjQuMjctNjkuMzgtMTYwLjY4Yy0xLjgzLTQuMzggMC03LjMgNC4zOC03LjNoMjguMTJjMy4yOSAwIDUuODQgMS40NiA2Ljk0IDQuNzVsNDkuMyAxMjEuNiA0OC41Ny0xMjEuNmMxLjEtMy4yOSAzLjY1LTQuNzUgNi45NC00Ljc1aDI1LjU2YzQuMzggMCA2LjIgMi45MiA0LjM4IDcuM3ptLTQwNC03LjMxaC0yNC40N2MtMy42NSAwLTUuODQgMi4xOS01Ljg0IDYuMjFWMTk4YzAgMzAuMzgtMTYuODQgNTAuMDEtNDIuMzYgNTAuMzhoLTEuNTljLTI1LjUyLS4zNy00Mi4zNi0xOS45OS00Mi4zNi01MC4zOHYtNzkuNmMwLTQuMDItMi4xOS02LjIxLTUuODQtNi4yMWgtMjQuNDdjLTMuNjUgMC01Ljg0IDIuMTktNS44NCA2LjIxdjg2LjkxYzAgNDMuNzQgMjYuNTYgNzMuNTEgNjUuNjIgNzcuNjUgMy40NS40OCA4LjE0Ljc4IDEzLjMxLjc4IDQuMTcgMCA4LjAzLS4xOSAxMS4xNy0uNTIgNDAuNDQtMi45NSA2OC41MS0zMy4xMSA2OC41MS03Ny45VjExOC40YzAtNC4wMi0yLjE5LTYuMjEtNS44NC02LjIxeiIgZmlsbD0iIzE3MWIxZiIvPjwvc3ZnPg==", "contentkeeper": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iY2tnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2YyYTkzYyIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjU1JSIgc3RvcC1jb2xvcj0iI2Q5OTQxZiIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM5YzZhMTciLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHg9IjQiIHk9IjQiIHdpZHRoPSIxODQiIGhlaWdodD0iMTg0IiByeD0iNDIiIGZpbGw9InVybCgjY2tnKSIvPgogIDxyZWN0IHg9IjQiIHk9IjQiIHdpZHRoPSIxODQiIGhlaWdodD0iMTg0IiByeD0iNDIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzVhM2QxMCIgc3Ryb2tlLXdpZHRoPSIyIiBvcGFjaXR5PSIwLjM1Ii8+CiAgPHRleHQgeD0iOTYiIHk9IjExOCIgZm9udC1mYW1pbHk9IlNlZ29lIFVJLCBIZWx2ZXRpY2EsIEFyaWFsLCBzYW5zLXNlcmlmIgogICAgICAgIGZvbnQtc2l6ZT0iNzgiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiCiAgICAgICAgdGV4dC1hbmNob3I9Im1pZGRsZSIgbGV0dGVyLXNwYWNpbmc9Ii0yIj5DSzwvdGV4dD4KPC9zdmc+", "all": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiMxNjE2MTYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48bGluZSB4MT0iOCIgeTE9IjYiIHgyPSIyMSIgeTI9IjYiLz48bGluZSB4MT0iOCIgeTE9IjEyIiB4Mj0iMjEiIHkyPSIxMiIvPjxsaW5lIHgxPSI4IiB5MT0iMTgiIHgyPSIyMSIgeTI9IjE4Ii8+PGNpcmNsZSBjeD0iMy41IiBjeT0iNiIgcj0iMS41IiBmaWxsPSIjMTYxNjE2IiBzdHJva2U9Im5vbmUiLz48Y2lyY2xlIGN4PSIzLjUiIGN5PSIxMiIgcj0iMS41IiBmaWxsPSIjMTYxNjE2IiBzdHJva2U9Im5vbmUiLz48Y2lyY2xlIGN4PSIzLjUiIGN5PSIxOCIgcj0iMS41IiBmaWxsPSIjMTYxNjE2IiBzdHJva2U9Im5vbmUiLz48L3N2Zz4="};
+/* ---- presentation — the original UI, restored ------------------------------
+   One card, cream paper, blocker picker + post picker, a live header with
+   pulsing dots, and a list of THE UNBLOCKED LINKS — that is the whole tool.
+   The engine underneath stays measured: a link is listed when the real page
+   loaded here, or its icon decoded, or the school's filter database puts it
+   in an allowed category. Everything else folds into a quiet "filtered out"
+   expander with its reason — and a category label you can click to correct
+   your school's policy either way. */
+
+var $ = function (id) { return document.getElementById(id); };
+var blockerBar = $("blockerBar"), blockerTrigger = $("blockerTrigger"),
+    blockerTriggerText = $("blockerTriggerText"), blockerTriggerLogoImg = $("blockerTriggerLogoImg"),
+    blockerMenu = $("blockerMenu"), postBar = $("postBar"), postTrigger = $("postTrigger"),
+    postTriggerText = $("postTriggerText"), postTriggerDate = $("postTriggerDate"),
+    postMenu = $("postMenu"), liveHeader = $("liveHeader"), liveLabel = $("liveLabel"),
+    liveCount = $("liveCount"), liveBar = $("liveBar"), list = $("list"),
+    stateEmpty = $("stateEmpty"), stateError = $("stateError"), errorMsg = $("errorMsg"),
+    retryBtn = $("retryBtn"), footer = $("footer"), countNum = $("countNum"),
+    countLabel = $("countLabel"), copyBtn = $("copyBtn"), filteredWrap = $("filteredWrap"),
+    filteredToggle = $("filteredToggle"), filteredNum = $("filteredNum"),
+    filteredLabel = $("filteredLabel"), filteredList = $("filteredList");
+
+var posts = [];
+var currentPost = 0;      /* index into posts; -1 = every post */
+var run = 0;              /* scan token — bumping it kills stale work */
+var presented = false;
+var rowMap = new Map();   /* host -> { url, why, catId } */
+var filteredRows = [];    /* [{ host, v }] */
+var unblockedCount = 0;
+
+var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function shortDate(iso) {
+  var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(iso || ""));
+  if (!m) return "";
+  return MONTHS[+m[2] - 1] + " " + (+m[3]);
+}
+function setStatus(t) { liveLabel.textContent = t; }
+
+/* ---- blocker picker -------------------------------------------------------- */
+
+var BLOCKER_ORDER = [
+  ["lightspeed", "Lightspeed Systems", "Live policy database — categories + verdicts"],
+  ["securly", "Securly", "Block-page fingerprint scan"],
+  ["goguardian", "GoGuardian", "Block-page fingerprint scan"],
+  ["fortiguard", "FortiGuard", "Block-page fingerprint scan"],
+  ["umbrella", "Cisco Umbrella", "Block-page fingerprint scan"],
+  ["zscaler", "Zscaler", "Block-page fingerprint scan"],
+  ["iboss", "iBoss", "Block-page fingerprint scan"],
+  ["contentkeeper", "ContentKeeper", "Block-page fingerprint scan"],
+  ["barracuda", "Barracuda", "Block-page fingerprint scan"],
+  ["sophos", "Sophos", "Block-page fingerprint scan"],
+  ["auto", "Auto-Detect", "Any filter's block page counts as proof"],
+  ["all", "All Links", "Show every link in the post — no checks"]
+];
+var LOGO_FOR = { lightspeed: "lightspeed", fortiguard: "fortiguard", umbrella: "cisco",
+                 securly: "securly", contentkeeper: "contentkeeper", all: "all" };
+
+(function restoreBlocker() {
+  var saved = unstore("ls19.blocker");
+  if (!saved) return;
+  for (var i = 0; i < BLOCKER_ORDER.length; i++) {
+    if (BLOCKER_ORDER[i][0] === saved) { currentBlocker = saved; return; }
+  }
+})();
+
+function setBlockerUI() {
+  var entry = null;
+  for (var i = 0; i < BLOCKER_ORDER.length; i++) {
+    if (BLOCKER_ORDER[i][0] === currentBlocker) entry = BLOCKER_ORDER[i];
+  }
+  if (!entry) { currentBlocker = "lightspeed"; entry = BLOCKER_ORDER[0]; }
+  blockerTriggerText.textContent = entry[1];
+  var key = LOGO_FOR[currentBlocker];
+  if (key && LOGOS[key]) {
+    blockerTriggerLogoImg.src = LOGOS[key];
+    blockerTriggerLogoImg.parentNode.style.display = "";
+  } else {
+    blockerTriggerLogoImg.parentNode.style.display = "none";
+  }
+}
+
+function buildBlockerMenu() {
+  blockerMenu.textContent = "";
+  BLOCKER_ORDER.forEach(function (e) {
+    var key = e[0], name = e[1], desc = e[2];
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "blocker-option";
+    btn.setAttribute("role", "option");
+    btn.setAttribute("aria-selected", key === currentBlocker ? "true" : "false");
+    var mark = document.createElement("span");
+    mark.className = "blocker-option-mark";
+    mark.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+    btn.appendChild(mark);
+    var lk = LOGO_FOR[key];
+    if (lk && LOGOS[lk]) {
+      var logo = document.createElement("span");
+      logo.className = "blocker-option-logo";
+      var img = document.createElement("img");
+      img.alt = "";
+      img.src = LOGOS[lk];
+      logo.appendChild(img);
+      btn.appendChild(logo);
+    }
+    var txt = document.createElement("span");
+    txt.className = "blocker-option-text";
+    var nm = document.createElement("span");
+    nm.className = "blocker-option-name";
+    nm.textContent = name;
+    var ds = document.createElement("span");
+    ds.className = "blocker-option-desc";
+    ds.textContent = desc;
+    txt.appendChild(nm);
+    txt.appendChild(ds);
+    btn.appendChild(txt);
+    btn.addEventListener("click", function () {
+      if (currentBlocker === key) { closeMenus(); return; }
+      currentBlocker = key;
+      store("ls19.blocker", key);
+      verdictEpoch++;
+      hostCache.clear();
+      setBlockerUI();
+      buildBlockerMenu();
+      closeMenus();
+      scan();
+    });
+    blockerMenu.appendChild(btn);
+  });
+}
+
+/* ---- post picker ----------------------------------------------------------- */
+
+function updatePostTrigger() {
+  if (currentPost === -1) {
+    postTriggerText.textContent = "Every Post";
+    postTriggerDate.textContent = "";
+    return;
+  }
+  var p = posts[currentPost];
+  postTriggerText.textContent = (p && p.title) || "Latest post";
+  postTriggerDate.textContent = p ? shortDate(p.date) : "";
+}
+
+function buildPostMenu() {
+  postMenu.textContent = "";
+  function row(label, date, sel, onClick) {
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "post-option";
+    btn.setAttribute("role", "option");
+    btn.setAttribute("aria-selected", sel ? "true" : "false");
+    var mark = document.createElement("span");
+    mark.className = "post-option-mark";
+    mark.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+    var txt = document.createElement("span");
+    txt.className = "post-option-text";
+    txt.textContent = label;
+    var dt = document.createElement("span");
+    dt.className = "post-option-date";
+    dt.textContent = date || "";
+    btn.appendChild(mark);
+    btn.appendChild(txt);
+    btn.appendChild(dt);
+    btn.addEventListener("click", onClick);
+    postMenu.appendChild(btn);
+  }
+  row("Every Post (All Links)", "", currentPost === -1, function () {
+    currentPost = -1;
+    store("ls19.post", "__all__");
+    closeMenus();
+    updatePostTrigger();
+    scan();
+  });
+  posts.forEach(function (p, i) {
+    row(p.title, shortDate(p.date), i === currentPost, (function (idx, url) {
+      return function () {
+        currentPost = idx;
+        store("ls19.post", url);
+        closeMenus();
+        updatePostTrigger();
+        scan();
+      };
+    })(i, p.url));
+  });
+}
+
+/* ---- menus open / close ---------------------------------------------------- */
+
+function closeMenus() {
+  blockerMenu.hidden = true;
+  postMenu.hidden = true;
+  blockerTrigger.setAttribute("aria-expanded", "false");
+  postTrigger.setAttribute("aria-expanded", "false");
+}
+blockerTrigger.addEventListener("click", function (ev) {
+  ev.stopPropagation();
+  var open = !blockerMenu.hidden;
+  closeMenus();
+  if (!open) {
+    blockerMenu.hidden = false;
+    blockerTrigger.setAttribute("aria-expanded", "true");
+  }
+});
+postTrigger.addEventListener("click", function (ev) {
+  ev.stopPropagation();
+  if (postTrigger.disabled) return;
+  var open = !postMenu.hidden;
+  closeMenus();
+  if (!open) {
+    postMenu.hidden = false;
+    postTrigger.setAttribute("aria-expanded", "true");
+  }
+});
+document.addEventListener("click", function (ev) {
+  if (!blockerBar.contains(ev.target) && !postBar.contains(ev.target)) closeMenus();
+});
+document.addEventListener("keydown", function (ev) {
+  if (ev.key === "Escape") closeMenus();
+});
+
+/* ---- the list: unblocked links only ---------------------------------------- */
+
+var CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+var ARROW_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+
+function appendUnblocked(host, url, v) {
+  if (rowMap.has(host)) return;
+  var a = document.createElement("a");
+  a.className = "item";
+  a.href = url;
+  a.target = "_blank";
+  a.rel = "noopener noreferrer";
+  var check = document.createElement("span");
+  check.className = "check";
+  check.innerHTML = CHECK_SVG;
+  var h = document.createElement("span");
+  h.className = "host";
+  h.textContent = host;
+  a.appendChild(check);
+  a.appendChild(h);
+  if (v && v.catId != null) {
+    var why = document.createElement("button");
+    why.type = "button";
+    why.className = "why-cat";
+    why.textContent = "Policy: " + (v.cat || "");
+    why.title = "Mark this category blocked / allowed at your school";
+    why.addEventListener("click", onCatClick);
+    a.appendChild(why);
+  }
+  var ar = document.createElement("span");
+  ar.className = "arrow";
+  ar.innerHTML = ARROW_SVG;
+  a.appendChild(ar);
+  list.appendChild(a);
+  rowMap.set(host, { url: url, el: a });
+  unblockedCount++;
+  countNum.textContent = String(unblockedCount);
+  footer.style.display = "";
+}
+
+function whyText(v) {
+  if (v.state === "blocked") {
+    if (v.via === "fp") return "Block Page";
+    if (v.via === "db") return v.cat ? "Policy: " + v.cat : "Filtered";
+    return "No Connection";
+  }
+  if (v.via === "dead") return "Domain Dead";
+  if (v.via === "unreachable") return "No Connection";
+  if (v.via === "cat") return v.cat ? "Category: " + v.cat : "Unverified";
+  if (v.via === "conflict") return "Another Filter Answered";
+  return "Unverified";
+}
+
+function renderFiltered() {
+  filteredList.textContent = "";
+  filteredRows.forEach(function (fr) {
+    var row = document.createElement("div");
+    row.className = "frow" + (fr.v.state === "blocked" ? " is-blocked" : "");
+    var h = document.createElement("span");
+    h.className = "fhost";
+    h.textContent = fr.host;
+    row.appendChild(h);
+    if (fr.v.catId != null) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "fwhy cat";
+      b.textContent = whyText(fr.v);
+      b.title = "Mark this category blocked / allowed at your school";
+      b.addEventListener("click", onCatClick);
+      row.appendChild(b);
+    } else {
+      var w = document.createElement("span");
+      w.className = "fwhy";
+      w.textContent = whyText(fr.v);
+      row.appendChild(w);
+    }
+    filteredList.appendChild(row);
+  });
+}
+
+/* Click a category label — anywhere it appears — to flip this school's
+   policy for that category. Persisted, and the rescan re-derives every
+   verdict from the cached facts, so it is instant. */
+function onCatClick(ev) {
+  ev.preventDefault();
+  ev.stopPropagation();
+  var carrier = ev.currentTarget;
+  var host = null;
+  if (carrier.parentNode && carrier.parentNode.classList &&
+      carrier.parentNode.classList.contains("frow")) {
+    var fh = carrier.parentNode.querySelector(".fhost");
+    host = fh ? fh.textContent : null;
+  } else if (carrier.parentNode && carrier.parentNode.classList &&
+      carrier.parentNode.classList.contains("item")) {
+    host = carrier.parentNode.querySelector(".host").textContent;
+  }
+  var fr = null, v = null;
+  if (host) {
+    for (var i = 0; i < filteredRows.length; i++) {
+      if (filteredRows[i].host === host) { fr = filteredRows[i]; break; }
+    }
+  }
+  if (!fr && carrier.parentNode && carrier.parentNode.classList &&
+      carrier.parentNode.classList.contains("item")) {
+    /* a listed (allowed-category) row: build a pseudo verdict from the label */
+    var hostEl = carrier.parentNode.querySelector(".host");
+    for (var j = 0; j < lastVerdicts.length; j++) {
+      if (lastVerdicts[j].host === (hostEl ? hostEl.textContent : "")) {
+        v = lastVerdicts[j].v;
+        break;
+      }
+    }
+  } else if (fr) {
+    v = fr.v;
+  }
+  if (!v || v.catId == null) return;
+  var was = catBlocked(+v.catId);
+  catOverrides[String(+v.catId)] = was ? 1 : 0;
+  saveCatOverrides();
+  var name = (CAT[+v.catId] || CAT[0])[0];
+  verdictEpoch++;
+  hostCache.clear();
+  scan('"' + name + '" marked ' + (was ? "allowed" : "blocked") +
+       " at your school — rechecking…");
+}
+
+/* ---- scan ------------------------------------------------------------------- */
+
+function resetScanUI() {
+  list.textContent = "";
+  list.style.display = "";
+  rowMap = new Map();
+  filteredRows = [];
+  unblockedCount = 0;
+  stateEmpty.style.display = "none";
+  stateError.style.display = "none";
+  filteredWrap.style.display = "none";
+  filteredList.textContent = "";
+  filteredList.classList.remove("open");
+  filteredToggle.setAttribute("aria-expanded", "false");
+  footer.style.display = "none";
+  countNum.textContent = "0";
+  liveHeader.classList.remove("done");
+  liveBar.style.width = "0%";
+  liveCount.textContent = "";
+}
+
+var lastVerdicts = [];   /* [{host, v}] — for category clicks on listed rows */
+
+function removeUnblocked(host) {
+  var rec = rowMap.get(host);
+  if (!rec) return;
+  if (rec.el && rec.el.parentNode) rec.el.parentNode.removeChild(rec.el);
+  rowMap.delete(host);
+  unblockedCount = Math.max(0, unblockedCount - 1);
+}
+
+/* apply one verdict to the visible UI — works during the scan AND after it
+   (the engine's authoritative pass reconciles through the same door) */
+function applyVerdict(host, url, v) {
+  lastVerdicts.push({ host: host, v: v });
+  var rec = rowMap.get(host);
+  if (v.state === "ok") {
+    if (!rec) appendUnblocked(host, url, v);
+    /* it may have been shown as filtered earlier (redemption / reconcile) —
+       pull the stale entry so the expander only counts what is filtered NOW */
+    for (var i = filteredRows.length - 1; i >= 0; i--) {
+      if (filteredRows[i].host === host) filteredRows.splice(i, 1);
+    }
+  } else {
+    if (rec) removeUnblocked(host);
+    var fr = null;
+    for (var i = 0; i < filteredRows.length; i++) {
+      if (filteredRows[i].host === host) { fr = filteredRows[i]; break; }
+    }
+    if (fr) fr.v = v;
+    else filteredRows.push({ host: host, url: url, v: v });
+  }
+  refreshCountsUI();
+}
+
+function refreshCountsUI() {
+  countNum.textContent = String(unblockedCount);
+  footer.style.display = unblockedCount ? "" : "none";
+  if (filteredRows.length) {
+    filteredWrap.style.display = "";
+    filteredNum.textContent = String(filteredRows.length);
+    renderFiltered();
+  } else {
+    filteredWrap.style.display = "none";
+    filteredList.textContent = "";
+  }
+  if (unblockedCount) {
+    list.style.display = "";
+    stateEmpty.style.display = "none";
+  } else if (liveHeader.classList.contains("done")) {
+    list.style.display = "none";
+    stateEmpty.style.display = "";
+  }
+}
+
+/* the engine's authoritative pass knocks here when a late fact changed a
+   verdict that was already shown */
+onVerdictUpdate = function (host, v) {
+  var url = null;
+  var rec = rowMap.get(host);
+  if (rec) url = rec.url;
+  if (!url) {
+    for (var i = 0; i < filteredRows.length; i++) {
+      if (filteredRows[i].host === host) { url = filteredRows[i].url; break; }
+    }
+  }
+  if (!url) url = "https://" + host + "/";
+  applyVerdict(host, url, v);
+};
+
+function scan(customLabel) {
+  run++;
+  var myRun = run;
+  resetScanUI();
+  lastVerdicts = [];
+  if (customLabel) setStatus(customLabel);
+  var post = currentPost === -1 ? null : posts[currentPost];
+  gatherLinks(post).then(function (links) {
+    if (myRun !== run) return;
+    var hosts = [], seen = new Set();
+    links.forEach(function (l) {
+      if (l.host && !seen.has(l.host)) { seen.add(l.host); hosts.push({ host: l.host, url: l.url }); }
+    });
+    if (!hosts.length) { finishScan(myRun); return; }
+
+    if (currentBlocker === "all") {
+      setStatus("Showing every link — no checks…");
+      hosts.forEach(function (h) { appendUnblocked(h.host, h.url, null); });
+      liveCount.innerHTML = "<b>" + hosts.length + "</b> links";
+      finishScan(myRun);
+      return;
+    }
+
+    if (!customLabel) setStatus("Checking " + hosts.length + " links…");
+    var settled = 0, total = hosts.length;
+    liveCount.innerHTML = "<b>0</b> of " + total;
+    var idx = 0;
+    function nextBatch() {
+      if (myRun !== run) return;
+      var batch = [];
+      while (idx < hosts.length && batch.length < HOST_PAR) batch.push(hosts[idx++]);
+      if (!batch.length) return;
+      Promise.all(batch.map(function (h) {
+        return checkHost(h.host, h.url).then(function (v) {
+          if (myRun !== run) return;
+          settled++;
+          liveCount.innerHTML = "<b>" + settled + "</b> of " + total;
+          liveBar.style.width = Math.round(settled / total * 100) + "%";
+          applyVerdict(h.host, h.url, v);
+          if (settled === total) finishScan(myRun);
+        });
+      })).then(nextBatch, nextBatch);
+    }
+    nextBatch();
+  }, function () {
+    if (myRun !== run) return;
+    liveHeader.classList.add("done");
+    stateError.style.display = "";
+    list.style.display = "none";
+  });
+}
+
+function finishScan(myRun) {
+  if (myRun !== run) return;
+  liveHeader.classList.add("done");
+  countLabel.textContent = currentBlocker === "all" ? "links" : "unblocked";
+  refreshCountsUI();
+  redeemUnclear(myRun, 0);
+}
+
+/* The DB socket can come back after the wave gave up on it — one school
+   network hiccup must not freeze half the blog as "unverified". Anything
+   that filtered out for lack of proof gets two quiet second passes; the
+   measured facts are already cached, so each pass is one lookup away from
+   listing the link. */
+function redeemUnclear(myRun, round) {
+  if (myRun !== run || currentBlocker === "all" || round >= 2) return;
+  var orphans = [];
+  filteredRows.forEach(function (fr) {
+    if (fr.v && (fr.v.via === "unverified" || fr.v.via === "unreachable" ||
+                 fr.v.via === "dead")) orphans.push({ host: fr.host, url: fr.url });
+  });
+  if (!orphans.length) return;
+  setTimeout(function () {
+    if (myRun !== run) return;
+    orphans.forEach(function (o) {
+      checkHost(o.host, o.url, DB_PATIENCE_LONG).then(function (v) {
+        if (myRun !== run) return;
+        applyVerdict(o.host, o.url, v);
+      });
+    });
+    redeemUnclear(myRun, round + 1);
+  }, round === 0 ? 2500 : 15000);
+}
+
+filteredToggle.addEventListener("click", function () {
+  var open = filteredList.classList.contains("open");
+  filteredList.classList.toggle("open", !open);
+  filteredToggle.setAttribute("aria-expanded", String(!open));
+});
+
+/* ---- copy ------------------------------------------------------------------- */
+
+function legacyCopy(text) {
+  var ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.position = "fixed";
+  ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.select();
+  var ok = false;
+  try { ok = document.execCommand("copy"); } catch (e) {}
+  document.body.removeChild(ta);
+  return ok;
+}
+copyBtn.addEventListener("click", function () {
+  var urls = [];
+  rowMap.forEach(function (r) { urls.push(r.url); });
+  if (!urls.length) return;
+  var text = urls.join("\n");
+  function done() {
+    copyBtn.textContent = "Copied";
+    setTimeout(function () { copyBtn.textContent = "Copy URLs"; }, 1400);
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done, function () {
+      if (legacyCopy(text)) done();
+    });
+  } else if (legacyCopy(text)) done();
+});
+
+/* ---- boot -------------------------------------------------------------------- */
+
+function present(found) {
+  presented = true;
+  posts = found;
+  currentPost = 0;
+  var saved = unstore("ls19.post");
+  if (saved === "__all__") currentPost = -1;
+  else if (saved) {
+    for (var i = 0; i < posts.length; i++) {
+      if (posts[i].url === saved) { currentPost = i; break; }
+    }
+  }
+  postBar.style.display = "";
+  postTrigger.disabled = false;
+  buildPostMenu();
+  updatePostTrigger();
+  scan();
+}
+
+function boot() {
+  liveHeader.classList.remove("done");
+  stateError.style.display = "none";
+  setStatus("Looking through the latest post…");
+  discoverPostsViaFeed().then(function (found) {
+    blogBlocked = false;
+    present(found);
+  }, function () {
+    setStatus("The blog is blocked here — reading it through the relay…");
+    discoverPostsRelay(function (n) {
+      if (!presented) setStatus("Reading the blog — " + n + " posts…");
+    }, function (all) {
+      if (!presented) {
+        blogBlocked = true;
+        calibrateIconTrust().then(function () { present(all.slice()); });
+      } else {
+        var known = new Set();
+        posts.forEach(function (p) { known.add(p.url); });
+        var fresh = all.filter(function (p) { return !known.has(p.url); });
+        if (fresh.length) {
+          posts = posts.concat(fresh);
+          buildPostMenu();
+        }
+      }
+    }).then(function () {}, function () {
+      if (!presented) {
+        liveHeader.classList.add("done");
+        stateError.style.display = "";
+        list.style.display = "none";
+      }
+    });
+  });
+}
+
+retryBtn.addEventListener("click", function () {
+  presented = false;
+  boot();
+});
+
+setBlockerUI();
+buildBlockerMenu();
+boot();
+</script>
+</body>
+</html>

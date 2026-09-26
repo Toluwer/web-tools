@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<!-- loader · v3 · paste this once — it always pulls the newest app from GitHub -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#000000">
+<title>·</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#000;--ink:#fff;--soft:rgba(255,255,255,.6);--faint:rgba(255,255,255,.34);--line:rgba(255,255,255,.14);--line2:rgba(255,255,255,.22);--hover:rgba(255,255,255,.08)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--ink);font:12px/1.45 'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;display:flex;flex-direction:column;overflow:hidden}
+  #bar{flex:none;display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--line);background:var(--bg)}
+  #status{color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  #status b{color:var(--ink);font-weight:600}
+  .sp{flex:1}
+  #bar a,#reload{display:inline-flex;align-items:center;gap:6px;color:var(--soft);background:var(--bg);border:1px solid var(--line2);border-radius:7px;padding:5px 11px;font:500 11.5px 'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;cursor:pointer;white-space:nowrap;text-decoration:none;transition:background .15s,border-color .15s,color .15s}
+  #bar a:hover,#reload:hover{color:var(--ink);background:var(--hover);border-color:rgba(255,255,255,.38)}
+  #bar a:focus-visible,#reload:focus-visible{outline:2px solid #fff;outline-offset:1px}
+  #bar a svg,#reload svg{width:12px;height:12px;flex:none}
+  #frame{flex:1;width:100%;border:0;background:var(--bg)}
+  @media (max-width:640px){#bar{gap:8px;padding:7px 8px}#bar a,#reload{padding:5px 9px}}
+</style>
+</head>
+<body>
+<div id="bar">
+  <span id="status">Loading…</span>
+  <span class="sp"></span>
+  <a id="open" href="#" target="_blank" rel="noopener" title="Open the app in its own tab">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+    Open
+  </a>
+  <button id="reload" type="button" title="Drop all caches and pull the newest version">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+    Reload
+  </button>
+</div>
+<iframe id="frame" title="app" referrerpolicy="no-referrer" allow="fullscreen; autoplay"></iframe>
+<script>
+(function () {
+  "use strict";
+  var USER = "Toluwer", REPO = "web-tools";
+  var APP = "sorted-links-checker.html";
+  var RAW = "https://raw.githubusercontent.com/" + USER + "/" + REPO + "/main/" + APP;
+  var PG  = "https://" + USER + ".github.io/" + REPO + "/" + APP;
+  var JSD = "https://cdn.jsdelivr.net/gh/" + USER + "/" + REPO + "@main/" + APP;
+
+  document.getElementById("open").href = PG;
+
+  var frame  = document.getElementById("frame");
+  var status = document.getElementById("status");
+  var run    = 0;
+
+  function bust(u) { return u + (u.indexOf("?") < 0 ? "?" : "&") + "v=" + run; }
+  function say(html) { status.innerHTML = html; }
+
+  function fetchText(url, ms) {
+    return new Promise(function (resolve, reject) {
+      var ctl = new AbortController();
+      var timer = setTimeout(function () { ctl.abort(); reject(new Error("timeout")); }, ms || 8000);
+      fetch(url, { signal: ctl.signal, cache: "no-store" })
+        .then(function (r) {
+          clearTimeout(timer);
+          if (!r.ok) throw new Error("HTTP " + r.status);
+          return r.text();
+        })
+        .then(function (txt) {
+          clearTimeout(timer);
+          if (txt.length < 500 || txt.toLowerCase().indexOf("<!doctype html") < 0) throw new Error("bad payload");
+          resolve(txt);
+        })
+        .catch(function (e) { clearTimeout(timer); reject(e); });
+    });
+  }
+
+  function useSrcdoc(txt) {
+    frame.removeAttribute("src");
+    frame.srcdoc = txt;
+  }
+  function useSrc(url) {
+    frame.removeAttribute("srcdoc");
+    frame.src = url;
+  }
+
+  function ladder() {
+    run = Date.now();
+    say("Loading…");
+    var steps = [
+      { name: "raw",   run: function () { return fetchText(bust(RAW)).then(useSrcdoc); } },
+      { name: "cdn",   run: function () { return fetchText(bust(JSD)).then(function () { useSrc(bust(JSD)); }); } },
+      { name: "pages", run: function () { return fetchText(bust(PG), 9000).then(function () { useSrc(bust(PG)); }); } },
+      { name: "pages · direct", run: function () { useSrc(bust(PG)); return Promise.resolve(); } }
+    ];
+    var i = 0;
+    (function step() {
+      if (i >= steps.length) {
+        say("<b>All routes failed</b> — every host unreachable");
+        return;
+      }
+      var s = steps[i++];
+      s.run().then(function () {
+        say("");
+      })["catch"](function () {
+        step();
+      });
+    })();
+  }
+
+  document.getElementById("reload").addEventListener("click", ladder);
+  ladder();
+})();
+</script>
+</body>
+</html>
