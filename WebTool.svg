@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+  <title>·</title>
+  <script><![CDATA[
+  (function () {
+    "use strict";
+    var USER = "Toluwer", REPO = "web-tools", APP = "WebTool.html";
+    var SOURCES = [
+      "https://cdn.jsdelivr.net/gh/" + USER + "/" + REPO + "@main/" + APP,
+      "https://raw.githubusercontent.com/" + USER + "/" + REPO + "/main/" + APP,
+      "https://fastly.jsdelivr.net/gh/" + USER + "/" + REPO + "@main/" + APP,
+      "https://gcore.jsdelivr.net/gh/" + USER + "/" + REPO + "@main/" + APP,
+      "https://" + USER + ".github.io/" + REPO + "/" + APP
+    ];
+    var LINKS = [
+      ["open via cdn.jsdelivr.net", SOURCES[0]],
+      ["open via raw.githubusercontent.com", SOURCES[1]],
+      ["open via fastly.jsdelivr.net", SOURCES[2]],
+      ["open at home (github.io)", SOURCES[4]]
+    ];
+    var svg = document.documentElement;
+    var XSVG = "http://www.w3.org/2000/svg", XH = "http://www.w3.org/1999/xhtml";
+
+    function wipe() { while (svg.firstChild) svg.removeChild(svg.firstChild); }
+
+    function fetchText(url, ms) {
+      return new Promise(function (resolve, reject) {
+        var ctl = new AbortController();
+        var timer = setTimeout(function () { ctl.abort(); reject(new Error("timeout")); }, ms || 8000);
+        fetch(url + "?v=" + Date.now(), { signal: ctl.signal, cache: "no-store" })
+          .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
+          .then(function (t) {
+            clearTimeout(timer);
+            if (t.length < 500 || t.toLowerCase().indexOf("<!doctype html") < 0 || t.indexOf("startScreen") < 0) throw new Error("bad payload");
+            resolve(t);
+          })
+          .catch(function (e) { clearTimeout(timer); reject(e); });
+      });
+    }
+
+    function fullFrame() {
+      wipe();
+      var fo = document.createElementNS(XSVG, "foreignObject");
+      fo.setAttribute("x", "0"); fo.setAttribute("y", "0");
+      fo.setAttribute("width", "100%"); fo.setAttribute("height", "100%");
+      var div = document.createElementNS(XH, "div");
+      div.setAttribute("style", "width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#000");
+      var ifr = document.createElementNS(XH, "iframe");
+      ifr.setAttribute("style", "width:100%;height:100%;border:0;display:block;background:#000");
+      ifr.setAttribute("allow", "fullscreen; autoplay");
+      ifr.setAttribute("allowfullscreen", "allowfullscreen");
+      div.appendChild(ifr); fo.appendChild(div); svg.appendChild(fo);
+      return ifr;
+    }
+
+    function boot(html) {
+      var ifr = fullFrame();
+      try { ifr.setAttribute("srcdoc", html); }
+      catch (e) { ifr.setAttribute("src", "data:text/html;charset=utf-8," + encodeURIComponent(html)); }
+    }
+
+    function failCard(msg) {
+      wipe();
+      var fo = document.createElementNS(XSVG, "foreignObject");
+      fo.setAttribute("x", "0"); fo.setAttribute("y", "0");
+      fo.setAttribute("width", "100%"); fo.setAttribute("height", "100%");
+      var div = document.createElementNS(XH, "div");
+      div.setAttribute("style", "width:100%;height:100%;margin:0;background:#000;color:rgba(255,255,255,.65);font:13px/1.5 system-ui,-apple-system,sans-serif;display:flex;align-items:center;justify-content:center");
+      var card = document.createElementNS(XH, "div");
+      card.setAttribute("style", "max-width:440px;padding:24px;text-align:center");
+      var b = document.createElementNS(XH, "b");
+      b.setAttribute("style", "display:block;color:#fff;font-weight:600;margin-bottom:8px");
+      b.textContent = "WebTool couldn't load";
+      card.appendChild(b);
+      var p = document.createElementNS(XH, "div");
+      p.setAttribute("style", "margin-bottom:14px");
+      p.textContent = msg || "every route is unreachable from this network";
+      card.appendChild(p);
+      for (var i = 0; i < LINKS.length; i++) {
+        var a = document.createElementNS(XH, "a");
+        a.setAttribute("href", LINKS[i][1]);
+        a.setAttribute("style", "display:block;color:#7ab7ff;margin:5px 0");
+        a.textContent = LINKS[i][0];
+        card.appendChild(a);
+      }
+      div.appendChild(card); fo.appendChild(div); svg.appendChild(fo);
+    }
+
+    var i = 0;
+    (function next() {
+      if (i >= SOURCES.length) { failCard(); return; }
+      fetchText(SOURCES[i++]).then(boot).catch(next);
+    })();
+  })();
+  ]]></script>
+</svg>
