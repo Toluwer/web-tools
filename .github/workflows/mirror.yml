@@ -1,0 +1,30 @@
+name: mirror
+on:
+  schedule:
+    - cron: "23 * * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "data/feed.json"
+permissions:
+  contents: write
+jobs:
+  feed:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: node scripts/mirror_feed.mjs
+      - name: commit if changed
+        run: |
+          git config user.name "mirror"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/feed.json
+          if git diff --cached --quiet; then
+            echo "feed unchanged"
+          else
+            git commit -m "feed"
+            git push
+          fi
+      - name: purge jsdelivr
+        run: curl -fsS -m 30 "https://purge.jsdelivr.net/gh/Toluwer/web-tools@main/data/feed.json" || true
