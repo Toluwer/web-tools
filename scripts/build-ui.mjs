@@ -90,3 +90,5 @@ loader=loader.replace('<div id="fail"><div><b>All routes failed</b>every host un
 if(!loader.includes('getElementById("retry").addEventListener'))loader=loader.replace('  ladder();','  document.getElementById("retry").addEventListener("click", ladder);\n  ladder();');
 write('loader.html',loader);
 console.log('Embedded Webtool and browser designs, and rebuilt the navigation shell.');
+await import('./upgrade-workspaces.mjs?build='+Date.now());
+await import('./upgrade-wisps.mjs?build='+Date.now());

@@ -13,6 +13,7 @@ const cover='<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600"><r
   await page.addInitScript(()=>{
     const now=Date.now();
     localStorage.setItem('bk26.cache',JSON.stringify({ts:now,events:[{title:'School event',start:now+86400000,end:now+90000000,loc:'Main campus',desc:'A school community event.'}],district:[{title:'Winter break',start:now+604800000,end:now+691200000}],news:[{title:'Campus news',img:'/WebTool.svg',url:'https://example.com',text:'An update from school.'}],announce:'School announcements',bell:{rows:[{n:'Period 1',s:450,e:505},{n:'Period 2',s:510,e:565}]},socials:[]}));
+    const school=JSON.parse(localStorage.getItem('bk26.cache'));school.events.push({title:'Varsity Football at Visitors',start:now+86400000,end:now+90000000,startKey:new Date(now+86400000).toISOString().slice(0,10),endKey:new Date(now+90000000).toISOString().slice(0,10),loc:'Away - Rival High School',desc:'An away game with a long description to verify compact status labels.'});localStorage.setItem('bk26.cache',JSON.stringify(school));
     window.__WT_AI_FN_OVERRIDE=messages=>{
       const last=messages.filter(m=>m.role==='user').pop()?.content||'';
       if(last.startsWith('TOOL RESULT'))return {text:'Your file is ready.\n\n```js\nconst message = "Hello";\nconsole.log(message);\n```',tcs:null};
@@ -46,6 +47,7 @@ const cover='<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600"><r
   for(const tab of ['today','events','sports','news','sched','holidays']){
     await page.locator('[data-bktab="'+tab+'"]').click();
     await page.screenshot({path:path.join(output,'school-'+tab+'.png')});
+    if(tab==='sports'){const tag=page.locator('.bk-tag.away:visible').first();await tag.waitFor();assert.equal(await tag.evaluate(n=>n.getBoundingClientRect().height<30),true,'Away tag stays compact');}
     if(tab==='sched')assert.equal(await page.locator('.bk-kv > div').evaluateAll(rows=>rows.every(row=>row.querySelector('.v').getBoundingClientRect().left-row.querySelector('.k').getBoundingClientRect().right>=16)),true,'School labels and values have a real layout gap');
   }
   await page.locator('#choiceBeam').click();
@@ -55,20 +57,20 @@ const cover='<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600"><r
   await page.locator('#beamEnterBtn').click();
   assert.equal(await page.locator('#beamNameIn').isVisible(),true);
   // Exercise the real artifact rendering and local downloads with a test AI provider.
-  await page.locator('.wt-fab').click();
+  await page.locator('#choiceAI').click();
   await page.locator('.wt-in').fill('Create a document');
   await page.locator('.wt-send').click();
-  await page.getByRole('button',{name:'Download .docx',exact:true}).waitFor();
+  await page.locator('.office-artifact').filter({hasText:'Design notes.docx'}).getByRole('button',{name:'Download',exact:true}).waitFor();
   await page.screenshot({path:path.join(output,'assistant-document.png')});
   let event=page.waitForEvent('download');
-  await page.getByRole('button',{name:'Download .docx',exact:true}).click();
+  await page.locator('.office-artifact').filter({hasText:'Design notes.docx'}).getByRole('button',{name:'Download',exact:true}).click();
   let download=await event;await download.saveAs(path.join(output,download.suggestedFilename()));
   await page.locator('.wt-in').fill('Create a presentation');await page.locator('.wt-send').click();
-  await page.getByRole('button',{name:'Download .pptx',exact:true}).waitFor();
-  assert.equal(await page.locator('.wt-slide').count(),3);
-  assert.equal(await page.locator('.wt-cttl').evaluateAll(titles=>titles.every(title=>title.querySelector('span').getBoundingClientRect().top-title.querySelector('b').getBoundingClientRect().bottom>=4)),true,'Artifact titles and metadata have vertical spacing');
+  await page.locator('.office-artifact').filter({hasText:'Design review.pptx'}).getByRole('button',{name:'Download',exact:true}).waitFor();
+  assert.equal(await page.locator('.office-artifact').count(),2);
+  assert.equal(await page.locator('.office-artifact-name').evaluateAll(titles=>titles.every(title=>title.querySelector('small').getBoundingClientRect().top-title.querySelector('strong').getBoundingClientRect().bottom>=4)),true,'Artifact titles and metadata have vertical spacing');
   await page.screenshot({path:path.join(output,'assistant-presentation.png')});
-  event=page.waitForEvent('download');await page.getByRole('button',{name:'Download .pptx',exact:true}).click();download=await event;await download.saveAs(path.join(output,download.suggestedFilename()));
+  event=page.waitForEvent('download');await page.locator('.office-artifact').filter({hasText:'Design review.pptx'}).getByRole('button',{name:'Download',exact:true}).click();download=await event;await download.saveAs(path.join(output,download.suggestedFilename()));
   await page.keyboard.press('Escape');
   await page.setViewportSize({width:390,height:844});
   await page.locator('#choiceMovies').click();
@@ -91,6 +93,11 @@ const cover='<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600"><r
   await browserPage.screenshot({path:path.join(output,'browser-settings.png')});
   await browserPage.locator('.settings-nav-item[data-section="appearance"]').click();
   await browserPage.screenshot({path:path.join(output,'browser-appearance.png')});
+  await browserPage.setViewportSize({width:390,height:844});
+  assert.equal(await browserPage.locator('.navbar').evaluate(n=>n.scrollWidth<=n.clientWidth+2),true,'Browser toolbar fits phone width');
+  await browserPage.locator('.settings-nav-item[data-section="appearance"]').click();
+  assert.equal(await browserPage.locator('.browser-settings-content').evaluate(n=>n.scrollWidth<=n.clientWidth+2),true,'Browser settings fit phone width');
+  await browserPage.screenshot({path:path.join(output,'browser-settings-mobile.png')});
   assert.deepEqual(errors,[]);
   console.log(JSON.stringify({passed:true,checked:'Movie search/detail, six school tabs, account mode, AI code/artifacts/downloads, mobile filters, browser home/settings',errors},null,2));
   await browser.close();

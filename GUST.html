@@ -76,6 +76,12 @@ main { display:flex; flex:1; min-height:0; position:relative; border:1px solid v
 .browser-settings-content { flex:1; min-width:0; overflow-y:auto; padding:28px 34px; display:flex; flex-direction:column; gap:24px; }
 .browser-settings-content .settings-section { padding:0; }
 .settings-card-head i { margin-right:0!important; } .settings-card-body > .settings-hint + * { margin-top:16px; }
+.nt-favorites { display:flex; flex-wrap:wrap; align-items:center; gap:12px 20px; }
+.nt-fav-wrapper { display:flex; align-items:center; gap:12px; padding:10px 4px; border-bottom:1px solid var(--bd); min-width:150px; }
+.nt-fav-box { width:34px; height:34px; min-width:34px; padding:6px; border-radius:9px; background:#292929; border:0; }
+.nt-fav-title { margin:0; text-align:left; font-size:13px; }
+.nt-fav-add { display:flex; align-items:center; gap:9px; padding:12px; border:1px solid var(--bd); border-radius:999px; font-size:12px; }
+.nt-fav-add i { margin-right:6px; }
 .settings-toggle-row,.settings-switch-row { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:15px 0; border-bottom:1px solid var(--bd); } .settings-switch-label { flex:1; } .settings-switch { cursor:pointer; flex:none; } .settings-switch-track { width:34px; height:20px; border-radius:999px; background:#4a4a4a; padding:3px; transition:background .15s; } .settings-switch-thumb { width:14px; height:14px; border-radius:50%; background:#fff; transition:transform .15s; } .settings-switch.on .settings-switch-track { background:var(--ac); } .settings-switch.on .settings-switch-thumb { transform:translateX(14px); } .settings-btn-danger { color:var(--err); border:1px solid #774b4b; padding:8px 14px; border-radius:10px; } .settings-slider { width:100%; accent-color:var(--ac); } .depends-disabled { opacity:.35; pointer-events:none; }
 .settings-engine-btn { display:flex; align-items:center; gap:12px; text-align:left; width:100%; padding:14px; border:1px solid var(--bd); border-radius:12px; margin:8px 0; } .settings-engine-btn.active { border-color:var(--ac); background:#202b3e; } .engine-name { flex:1; font-weight:500; } .engine-url { color:var(--tx3); font-size:11px; } .engine-radio { width:14px; height:14px; border:1px solid var(--tx3); border-radius:50%; } .settings-engine-btn.active .engine-radio { border:4px solid var(--ac); }
 .locale-dropdown-trigger { padding:10px 14px; background:#292929; border:1px solid var(--bd2); border-radius:10px; } .locale-dropdown-panel { display:none; padding:8px; background:#292929; border:1px solid var(--bd2); border-radius:12px; } .locale-dropdown-panel.open { display:block; } .locale-dropdown-list { max-height:260px; overflow:auto; } .locale-dropdown-option { display:block; width:100%; text-align:left; padding:9px; border-radius:8px; } .locale-dropdown-option:hover { background:#3a3a3a; }
@@ -90,6 +96,12 @@ main { display:flex; flex:1; min-height:0; position:relative; border:1px solid v
 @media(max-width:700px) { .app { padding:0; } .titlebar { padding:8px 5px; gap:5px; } .brand { min-width:0; font-size:12px; padding:5px; } .brand span { display:none; } .tab { width:140px; min-width:100px; } .navbar { padding:9px; border-radius:0; gap:5px; } .tool-toggle span,.engine-select,.navbar .toolbar-actions { display:none; } .omnibox { min-width:60px; padding:1px 7px; } .omnibox-actions { gap:0; } .nav-pill-btn,.nav-btn,.omni-btn,.tool-btn { width:26px; } .nt-content { padding:40px 22px 100px; justify-content:flex-start; } .nt-header { margin:12px 0 30px; } .nt-brand { font-size:25px; } .nt-search { padding:10px; gap:5px; } .nt-search-engine { font-size:10px; gap:4px; } .nt-favorites { gap:8px; } .nt-fav-box { min-width:70px; padding:10px; } .logs,.elements,.ai-sidebar { position:absolute; inset:0 0 0 auto; width:95vw; z-index:1000; } .find-bar { width:calc(100% - 20px); right:10px; } .settings-section { padding:24px 18px; } .settings-card-body { padding:18px; } }
 @media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none !important; transition:none !important; } }
 @media(max-width:700px) {
+  .navbar { flex-wrap:wrap; gap:8px; }
+  .omnibox { flex-basis:calc(100% - 190px); min-width:150px; }
+  .navbar > .tool-btn,.navbar > .tool-toggle { flex:none; }
+  .navbar .toolbar-actions { display:flex; }
+  .omnibox .omnibox-actions { flex-shrink:0; }
+  .omnibox .url-input { min-width:0; width:0; }
   .browser-settings-layout { flex-direction:column; }
   .browser-settings-sidebar { width:100%; min-width:0; height:58px; flex:none; border-right:0; border-bottom:1px solid var(--bd); padding:8px 0; overflow-x:auto; }
   .browser-settings-sidebar nav { flex-direction:row!important; width:max-content; padding:0 12px!important; }
@@ -6854,35 +6866,67 @@ window._libcurlReady = true;
             // here lets GUST self-heal; users can override it in Settings.
             const DEFAULT_FALLBACK_WISP = "wss://mages.io/wisp/";
 
-            // ── WISP pool: round-robin across a list of public relays ──────
-            // Benchmarked by raw WebSocket handshake time; the pool is only
-            // consulted when Settings → Connection → "Enable pool round-robin"
-            // is on. WISP (above) stays the sticky single-server config used
-            // everywhere else, so pool mode is fully opt-in.
-            // Every entry verified live END-TO-END from a file:// null-origin
-            // context (the only environment that matches GUST): open WS → WISP
-            // CONTINUE handshake → real CONNECT+DATA proxying a live HTTP request,
-            // 3/3 reliability runs. NOT just DNS/WS-upgrade — a bare handshake
-            // passes on dead-backend proxies and on relays that reject file://
-            // origin, both of which are excluded here. Re-verified 2026-07-16
-            // (13 relays; ~110 candidate hosts tested, the rest were unregistered,
-            // static-only, dead-backend, or file://-rejecting). Ordered
-            // fastest-first by measured median latency, though rankPoolCandidates
-            // re-sorts on live health data at runtime.
+            // Verified HTTP and certificate-validated HTTPS through actual Wisp TCP streams.
+            // Deduplicated by hostname. Sources and timestamps: data/wisps.json.
+            // Availability is rechecked at runtime; no invented or handshake-only entries.
             const WISP_POOL_DEFAULTS = [...new Set([
-                "wss://definitelyscience.com/wisp/",   // 111ms
-                "wss://mages.io/wisp/",                // 114ms
-                "wss://lichology.com/wisp/",           // 118ms
-                "wss://motor-cycle-part.org/wisp/",    // 127ms
-                "wss://area.forwardersoft.com/wisp/",  // 154ms
-                "wss://truf.the-nest.at/wisp/",        // 168ms
-                "wss://thoughts.forwardersoft.com/wisp/", // 198ms
-                "wss://wisp.terbiumon.top/wisp/",      // 223ms
-                "wss://anura.pro/",                    // 280ms
-                "wss://wisp.mercurywork.shop/",        // 294ms
-                "wss://nebulaproxy.io/wisp/",          // 304ms
-                "wss://invisiproxy.com/wisp/",         // 369ms
-                "wss://english.algebra.teacher.vocabulary.homework.forwardersoft.com/wisp/" // 361ms
+                "wss://definitelyscience.com/wisp/",
+                "wss://fern.best/wisp/",
+                "wss://terbiumon.top/wisp/",
+                "wss://petezahgames.com/api/websocket/",
+                "wss://shadow-3.swanndvr.net/wisp/",
+                "wss://mages.io/wisp/",
+                "wss://55gms.com/wisp/",
+                "wss://gointospace.app/wisp/",
+                "wss://admin.proxy.hydrovolter.com/scramjet/wisp/",
+                "wss://lichology.com/wisp/",
+                "wss://nex-velo.up.railway.app/wisp/",
+                "wss://anura.pro/wisp/",
+                "wss://wisp.mercurywork.shop/wisp/",
+                "wss://businessschool.cc/wisp/",
+                "wss://motor-cycle-part.org/wisp/",
+                "wss://wisp.terbiumon.top/wisp/",
+                "wss://symbolic-jocelyne-jxo-prod-c0e42749.apps.mistral.run/",
+                "wss://3658729.ritebooks.com/wisp/",
+                "wss://info.videnom.com/wisp/",
+                "wss://sciencepark.cc/wisp/",
+                "wss://wisp.waved.site/",
+                "wss://shadow.curesoutpost.com/wisp/",
+                "wss://holywisp.fracit.al/",
+                "wss://inkmath.adijaya.id/wisp/",
+                "wss://sciencenews.cc/wisp/",
+                "wss://bare-server.fly.dev/wisp/",
+                "wss://homeworkhelp.cc/wisp/",
+                "wss://arsenic.smartfoloo.space/wisp/",
+                "wss://crypto-college.cc/wisp/",
+                "wss://pgis-wisp.joytree.site/",
+                "wss://info.hotelsunrisegrand.com/wisp/",
+                "wss://us-east.wisp.q13x.com/",
+                "wss://linuxontab-net.fly.dev/wisp",
+                "wss://tinf0il.site/wisp/",
+                "wss://shasta-lite.vercel.app/wisp/",
+                "wss://voiceless-dorry-nothinggames-cd908596.koyeb.app/",
+                "wss://wisp.webmc.fun/",
+                "wss://athollcottage.com/connection/",
+                "wss://phantom.lol/wisp/",
+                "wss://budsin-wisp.onrender.com/wisp/",
+                "wss://fulcrumtheatreinc.com/wisp/",
+                "wss://kristenblackburnvolleyballcamps.com/socket/",
+                "wss://tungtung.best/wisp/",
+                "wss://info.shop1stoponline.com/wisp/",
+                "wss://civil.quartinal.me/wisp/",
+                "wss://hurt-agata-liventcord-api-7072e9a6.koyeb.app/",
+                "wss://edushasta.lol/wisp/",
+                "wss://bestspark.org/wisp/",
+                "wss://mex-ubg-wisp.onrender.com/wisp/",
+                "wss://studyhub.colegioitalocomposto.cl/wisp/",
+                "wss://studyhub.kkmsilvia.com/wisp/",
+                "wss://tokyo.new-updates.info/wisp/",
+                "wss://browserjs-production.up.railway.app/wisp/",
+                "wss://studyworkandmore.uk/wisp/",
+                "wss://studyhub.asirargentina.com.ar/wisp/",
+                "wss://triplet.bumon.ar/wisp/",
+                "wss://pgis-wisp.getvoroa.com/"
             ])];
             let wispHealth = (function () { try { return JSON.parse(ls.getItem('gust:wisp:health:v1') || '{}'); } catch { return {}; } })();
             function saveWispHealth() { try { ls.setItem('gust:wisp:health:v1', JSON.stringify(wispHealth)); } catch {} }
@@ -6939,13 +6983,17 @@ window._libcurlReady = true;
                     try {
                         const pool = getWispPool();
                         let done = 0;
-                        await Promise.all(pool.map(async url => {
+                        /* bounded relay audit */
+                        let cursor = 0;
+                        await Promise.all(Array.from({length: Math.min(4,pool.length)},async () => {
+                          while(cursor < pool.length){const url = pool[cursor++];
                             const { latency, healthy, samples } = await probeWispPoolServer(url);
                             wispHealth[url] = { latency, checkedAt: Date.now(), healthy, samples };
                             done++;
                             if (onProgress) { try { onProgress(done, pool.length); } catch (e) {} }
                             if (typeof renderWispPoolList === 'function') renderWispPoolList();
                             if (typeof renderGXWispList === 'function') renderGXWispList();
+                          }
                         }));
                         saveWispHealth();
                     } finally {
@@ -17384,27 +17432,10 @@ _VIEWER_DL_JS +
                     hideOverlay();
                     updateNav();
 
-                    // ── Boot gate: full WISP-pool benchmark before any page loads ──
-                    // With multi-WISP round-robin on (default), hold navigation behind
-                    // a complete pool benchmark so the first fetch already has real
-                    // latency data to pick from. Capped so a dead network can't hang
-                    // boot forever — after the cap the benchmark finishes in the
-                    // background and navigation proceeds.
-                    // ponytail: 25s cap; raise only if huge pools routinely exceed it.
-                    if (poolModeOn() && typeof curl !== 'undefined' && curl) {
-                        try {
-                            showBootBenchmark();
-                            const bench = benchmarkWispPool(setBootBenchmarkProgress).then(() => { try { rememberFastestRelay(); } catch (e) {} });
-                            // live progress even when setup started the benchmark first
-                            const tick = setInterval(() => {
-                                const pool = getWispPool();
-                                setBootBenchmarkProgress(pool.filter(u => wispHealth[u]).length, pool.length);
-                            }, 200);
-                            await Promise.race([bench, new Promise(r => setTimeout(r, 25000))]);
-                            clearInterval(tick);
-                        } catch (e) {} finally {
-                            hideBootBenchmark();
-                        }
+                    // Audit the expanded pool in the background. Navigation is ready
+                    // immediately; a larger relay directory must not block the UI.
+                    if(poolModeOn() && typeof curl !== 'undefined' && curl){
+                        benchmarkWispPool().then(()=>{try{rememberFastestRelay();}catch(e){}}).catch(()=>{});
                     }
 
             // Signal that libcurl init is complete so deferred UI (tutorial, etc.) can start

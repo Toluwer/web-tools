@@ -1,15 +1,21 @@
 /* Navigation, tool finder, and keyboard behavior for the new presentation shell. */
 (function () {
   'use strict';
+  const iconMap={choiceHome:'home',choiceChecker:'checker',choiceTest:'test',choiceMovies:'movies',choiceBrook:'school',choiceBeam:'chat',choiceGust:'browser'};
+  Object.keys(iconMap).forEach(function(id){var b=document.getElementById(id);b.querySelector('svg').outerHTML=WTIcon(iconMap[id]);});
+  [['choiceAI','AI assistant','ai'],['choiceDocuments','Documents','documents']].forEach(function(item){var b=document.createElement('button');b.id=item[0];b.type='button';b.className='dock-item';b.innerHTML=WTIcon(item[2])+'<span class="dk-lab">'+item[1]+'</span>';document.getElementById('dock').appendChild(b);b.addEventListener('click',function(){if(item[0]==='choiceAI')window.__wtAi.open();else window.showView('documents');});});
+  [['beamSearchBtn','search'],['beamDrawerBtn','menu'],['beamCloudIc','cloud']].forEach(function(item){var b=document.getElementById(item[0]);if(b)b.innerHTML=WTIcon(item[1]);});
   var tools = [
     {id:'choiceChecker',name:'Link checker',desc:'Find available links from the latest posts.',group:'Links'},
     {id:'choiceTest',name:'Link tester',desc:'Check one address or a whole list of links.',group:'Links'},
     {id:'choiceMovies',name:'Movies & series',desc:'Find something to watch. Pick up where you left off.',group:'Explore'},
     {id:'choiceBrook',name:'Brookwood Hub',desc:'Your day, events, news, and school schedule.',group:'Explore'},
     {id:'choiceBeam',name:'Chat',desc:'Stay in touch, share files, and start a conversation.',group:'Connect'},
+    {id:'choiceAI',name:'AI assistant',desc:'Create, research, write, and work with your files.',group:'Create'},
+    {id:'choiceDocuments',name:'Documents',desc:'Open documents and presentations in a dedicated workspace.',group:'Create'},
     {id:'choiceGust',name:'Browser',desc:'Open your browser in a separate workspace.',group:'Explore'}
   ];
-  var names = {start:'All tools',checker:'Link checker',test:'Link tester',movies:'Movies & series',brook:'Brookwood Hub',beam:'Chat'};
+  var names = {start:'All tools',checker:'Link checker',test:'Link tester',movies:'Movies & series',brook:'Brookwood Hub',beam:'Chat',ai:'AI assistant',documents:'Documents'};
   var $ = function (id) { return document.getElementById(id); };
   function node(tag,cls,text) { var n=document.createElement(tag);if(cls)n.className=cls;if(text)n.textContent=text;return n; }
   function sidebar(title,cls) { var side=node('aside','context-sidebar '+(cls||''));side.setAttribute('aria-label',title);side.appendChild(node('h2','context-title',title));return side; }
@@ -57,7 +63,7 @@
   Object.keys(contextViews).forEach(function(key){var side=contextViews[key];side.querySelectorAll('.context-title,.context-button,.context-note').forEach(function(n){n.remove();});side.remove();});
   function syncSidebar(name){
     currentView=name;
-    sideNav.querySelectorAll('[data-navigate]').forEach(function(b){var active=b.dataset.navigate===({start:'choiceHome',checker:'choiceChecker',test:'choiceTest',movies:'choiceMovies',brook:'choiceBrook',beam:'choiceBeam'}[name]);b.classList.toggle('active',active);if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
+    sideNav.querySelectorAll('[data-navigate]').forEach(function(b){var active=b.dataset.navigate===({start:'choiceHome',checker:'choiceChecker',test:'choiceTest',movies:'choiceMovies',brook:'choiceBrook',beam:'choiceBeam',ai:'choiceAI',documents:'choiceDocuments'}[name]);b.classList.toggle('active',active);if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
     Object.values(contextViews).forEach(function(side){side.hidden=true;});
     mobileContext.hidden=!contextViews[name]||!contextViews[name].children.length;
     if(contextViews[name]){contextViews[name].hidden=false;(contextMedia.matches?mobileContext:detailSlot).appendChild(contextViews[name]);}
@@ -120,7 +126,7 @@
   document.querySelectorAll('input,textarea,select').forEach(function(input){if(!input.hasAttribute('aria-label')&&!input.labels?.length&&input.placeholder)input.setAttribute('aria-label',input.placeholder);});
   document.addEventListener('keydown',function(e){
     if(e.key!=='Tab'||dialog.open)return;
-    var modal=Array.from(document.querySelectorAll('.wt-panel:not([hidden]),.beam-pwback:not([hidden]),.bm-fv:not([hidden])')).filter(function(n){return n.getBoundingClientRect().height>0;}).pop();
+    var modal=Array.from(document.querySelectorAll('.beam-pwback:not([hidden]),.bm-fv:not([hidden])')).filter(function(n){return n.getBoundingClientRect().height>0;}).pop();
     if(!modal)return;
     var focusable=Array.from(modal.querySelectorAll('button:not(:disabled),input:not(:disabled),textarea:not(:disabled),select:not(:disabled),a[href],[tabindex="0"]')).filter(function(n){return n.getBoundingClientRect().height>0;});
     if(!focusable.length)return;
@@ -128,11 +134,7 @@
     if(e.shiftKey&&(document.activeElement===first||!modal.contains(document.activeElement))){e.preventDefault();last.focus();}
     else if(!e.shiftKey&&(document.activeElement===last||!modal.contains(document.activeElement))){e.preventDefault();first.focus();}
   });
-  var aiPanel=document.querySelector('.wt-panel');
-  if(aiPanel){aiPanel.setAttribute('aria-modal','true');var returnFocus=null;new MutationObserver(function(){
-    if(!aiPanel.hidden){if(!aiPanel.contains(document.activeElement))returnFocus=document.activeElement;}
-    else if(returnFocus&&returnFocus.isConnected){returnFocus.focus({preventScroll:true});returnFocus=null;}
-  }).observe(aiPanel,{attributes:true,attributeFilter:['hidden']});}
+  window.WTOffice.mount();
   $('homeTitle').textContent='All tools';
   $('homeTitle').nextElementSibling.textContent='Your tools, together in one place.';
   $('assistantTitle').lastChild.textContent=' Webtool AI';

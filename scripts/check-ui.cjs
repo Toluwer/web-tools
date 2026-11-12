@@ -13,7 +13,7 @@ fs.mkdirSync(output,{recursive:true});
   page.on('pageerror',e=>errors.push(e.message));
   await page.goto(base+'/WebTool.html');
   await page.locator('.tool-card').first().waitFor();
-  assert.equal(await page.locator('.tool-card').count(),6);
+  assert.equal(await page.locator('.tool-card').count(),8);
   await page.screenshot({path:path.join(output,'home-desktop.png')});
   await page.locator('#homeSearch').fill('movie');
   assert.equal(await page.locator('.tool-card:visible').count(),1);
@@ -28,7 +28,7 @@ fs.mkdirSync(output,{recursive:true});
   await page.locator('#testBtn').click();
   assert.match(await page.locator('#testErr').textContent(),/doesn't look like/);
   await page.screenshot({path:path.join(output,'tester-desktop.png')});
-  for(const [id,name] of [['choiceChecker','checker'],['choiceMovies','movies'],['choiceBrook','school'],['choiceBeam','chat']]){
+  for(const [id,name] of [['choiceChecker','checker'],['choiceMovies','movies'],['choiceBrook','school'],['choiceBeam','chat'],['choiceAI','ai'],['choiceDocuments','documents']]){
     await page.locator('#'+id).click();
     await page.waitForTimeout(1800);
     assert.equal(await page.locator('#'+id).getAttribute('aria-current'),'page');

@@ -1,0 +1,349 @@
+{
+  "checkedAt": "2026-11-12T03:33:24.338Z",
+  "method": "Wisp v1 TCP stream with null Origin; HTTP 200 from example.com, followed by certificate-validated HTTPS 200 to example.com:443. Deduplicated by hostname.",
+  "additional": 50,
+  "servers": [
+    {
+      "url": "wss://definitelyscience.com/wisp/",
+      "source": "https://github.com/verdjs/Verdi/blob/519e034c460a3e78e57bf0aab6c38c562686c174/pages/settings.html",
+      "checkedAt": "2026-11-12T03:31:25.701Z",
+      "latencyMs": 533
+    },
+    {
+      "url": "wss://fern.best/wisp/",
+      "source": "https://github.com/fearr984/boredos/blob/a1912fbc8042f6acbb2a310a583bec3d870c263c/public/index.html",
+      "checkedAt": "2026-11-12T03:31:25.708Z",
+      "latencyMs": 573
+    },
+    {
+      "url": "wss://terbiumon.top/wisp/",
+      "source": "https://github.com/PsychoSmiley/NPCAgent/blob/2dda7165ce9d60f58e1ee5b6bacfdcb2ca43fddb/index.html",
+      "checkedAt": "2026-11-12T03:31:25.805Z",
+      "latencyMs": 639
+    },
+    {
+      "url": "wss://petezahgames.com/api/websocket/",
+      "source": "https://github.com/PopAnynomous234/prox/blob/d09f0894945a599f2bfe542c7c8a2dab9bc24fca/index.html",
+      "checkedAt": "2026-11-12T03:31:26.539Z",
+      "latencyMs": 733
+    },
+    {
+      "url": "wss://shadow-3.swanndvr.net/wisp/",
+      "source": "https://github.com/wl-unblock/MIN-wlyt-Plus/blob/615bd2165d357baa0e55c3c18126c2603781ae6c/proxy/url.html",
+      "checkedAt": "2026-11-12T03:31:26.545Z",
+      "latencyMs": 836
+    },
+    {
+      "url": "wss://mages.io/wisp/",
+      "source": "https://github.com/verdjs/Verdi/blob/519e034c460a3e78e57bf0aab6c38c562686c174/pages/settings.html",
+      "checkedAt": "2026-11-12T03:31:26.684Z",
+      "latencyMs": 980
+    },
+    {
+      "url": "wss://55gms.com/wisp/",
+      "source": "https://github.com/PsychoSmiley/NPCAgent/blob/2dda7165ce9d60f58e1ee5b6bacfdcb2ca43fddb/index.html",
+      "checkedAt": "2026-11-12T03:31:26.754Z",
+      "latencyMs": 1590
+    },
+    {
+      "url": "wss://gointospace.app/wisp/",
+      "source": "https://github.com/three-1415/Simple-Scramjet-proxy-static-HTML-/blob/ef346ee86306a1b5b1689d256b5f38813cc0a08b/proxy.html",
+      "checkedAt": "2026-11-12T03:31:26.832Z",
+      "latencyMs": 286
+    },
+    {
+      "url": "wss://admin.proxy.hydrovolter.com/scramjet/wisp/",
+      "source": "https://github.com/Humid-Mouse48/301010044444442831applesauce-queryw.dska/blob/8611e1185f728ca6f0d104a3b36b35d69cef68bf/pages/badgame.html",
+      "checkedAt": "2026-11-12T03:31:26.902Z",
+      "latencyMs": 362
+    },
+    {
+      "url": "wss://lichology.com/wisp/",
+      "source": "https://github.com/verdjs/Verdi/blob/519e034c460a3e78e57bf0aab6c38c562686c174/pages/settings.html",
+      "checkedAt": "2026-11-12T03:31:26.957Z",
+      "latencyMs": 272
+    },
+    {
+      "url": "wss://nex-velo.up.railway.app/wisp/",
+      "source": "https://github.com/Nex-Mav/Nex.Velo/blob/3eebcd43baa32fc268882742589220668c32db19/public/app.js",
+      "checkedAt": "2026-11-12T03:31:27.306Z",
+      "latencyMs": 473
+    },
+    {
+      "url": "wss://anura.pro/wisp/",
+      "source": "https://github.com/riftaway7-code/chromium/blob/8f221ae3d8582aaadc5dccd8db7b126b0cf097b2/public/proxy.html",
+      "checkedAt": "2026-11-12T03:31:27.343Z",
+      "latencyMs": 588
+    },
+    {
+      "url": "wss://wisp.mercurywork.shop/wisp/",
+      "source": "https://github.com/Theos21/blugamesnetwork/blob/c0cf0372da0e7f29ac9426b29f319bc9167b9349/scram.html",
+      "checkedAt": "2026-11-12T03:31:27.559Z",
+      "latencyMs": 656
+    },
+    {
+      "url": "wss://businessschool.cc/wisp/",
+      "source": "https://github.com/0800WebDev/zinc/blob/0809410d194fa0d980442e247f81b7ccea2fe0a4/script.js",
+      "checkedAt": "2026-11-12T03:31:27.753Z",
+      "latencyMs": 795
+    },
+    {
+      "url": "wss://motor-cycle-part.org/wisp/",
+      "source": "existing pool",
+      "checkedAt": "2026-11-12T03:31:27.776Z",
+      "latencyMs": 469
+    },
+    {
+      "url": "wss://wisp.terbiumon.top/wisp/",
+      "source": "https://github.com/PsychoSmiley/NPCAgent/blob/2dda7165ce9d60f58e1ee5b6bacfdcb2ca43fddb/index.html",
+      "checkedAt": "2026-11-12T03:31:27.855Z",
+      "latencyMs": 511
+    },
+    {
+      "url": "wss://symbolic-jocelyne-jxo-prod-c0e42749.apps.mistral.run/",
+      "source": "https://github.com/Jxoj/SuperUser/blob/529461d01e9a2b3e269245a3faaafcb9284645ce/index.html",
+      "checkedAt": "2026-11-12T03:31:29.091Z",
+      "latencyMs": 1337
+    },
+    {
+      "url": "wss://3658729.ritebooks.com/wisp/",
+      "source": "https://github.com/0800WebDev/zinc/blob/0809410d194fa0d980442e247f81b7ccea2fe0a4/script.js",
+      "checkedAt": "2026-11-12T03:31:29.151Z",
+      "latencyMs": 1591
+    },
+    {
+      "url": "wss://info.videnom.com/wisp/",
+      "source": "https://github.com/0800WebDev/zinc/blob/0809410d194fa0d980442e247f81b7ccea2fe0a4/script.js",
+      "checkedAt": "2026-11-12T03:31:29.305Z",
+      "latencyMs": 1528
+    },
+    {
+      "url": "wss://sciencepark.cc/wisp/",
+      "source": "https://github.com/0800WebDev/zinc/blob/0809410d194fa0d980442e247f81b7ccea2fe0a4/script.js",
+      "checkedAt": "2026-11-12T03:31:29.313Z",
+      "latencyMs": 1457
+    },
+    {
+      "url": "wss://wisp.waved.site/",
+      "source": "https://github.com/ww5103543-boop/suned/blob/7fc6875b1fb405fefb20a56862a5f08be6d3727d/apps/minecraft.html",
+      "checkedAt": "2026-11-12T03:31:29.493Z",
+      "latencyMs": 401
+    },
+    {
+      "url": "wss://shadow.curesoutpost.com/wisp/",
+      "source": "https://github.com/wl-unblock/MIN-wlyt-Plus/blob/615bd2165d357baa0e55c3c18126c2603781ae6c/proxy/url.html",
+      "checkedAt": "2026-11-12T03:31:29.716Z",
+      "latencyMs": 564
+    },
+    {
+      "url": "wss://holywisp.fracit.al/",
+      "source": "https://github.com/Nex-Mav/Nex.Velo/blob/3eebcd43baa32fc268882742589220668c32db19/public/servers.js",
+      "checkedAt": "2026-11-12T03:31:29.803Z",
+      "latencyMs": 489
+    },
+    {
+      "url": "wss://inkmath.adijaya.id/wisp/",
+      "source": "https://github.com/tharun9772/Bloxcraft-UBG/blob/6a67481f46e63c190f2a9933b8bf7e09084b5e8c/assets/ws.js",
+      "checkedAt": "2026-11-12T03:31:30.008Z",
+      "latencyMs": 515
+    },
+    {
+      "url": "wss://sciencenews.cc/wisp/",
+      "source": "https://github.com/0800WebDev/zinc/blob/0809410d194fa0d980442e247f81b7ccea2fe0a4/script.js",
+      "checkedAt": "2026-11-12T03:31:30.150Z",
+      "latencyMs": 844
+    },
+    {
+      "url": "wss://bare-server.fly.dev/wisp/",
+      "source": "https://github.com/0800WebDev/zinc/blob/0809410d194fa0d980442e247f81b7ccea2fe0a4/script.js",
+      "checkedAt": "2026-11-12T03:31:30.308Z",
+      "latencyMs": 504
+    },
+    {
+      "url": "wss://homeworkhelp.cc/wisp/",
+      "source": "https://github.com/0800WebDev/zinc/blob/0809410d194fa0d980442e247f81b7ccea2fe0a4/script.js",
+      "checkedAt": "2026-11-12T03:31:30.466Z",
+      "latencyMs": 749
+    },
+    {
+      "url": "wss://arsenic.smartfoloo.space/wisp/",
+      "source": "https://github.com/PsychoSmiley/NPCAgent/blob/2dda7165ce9d60f58e1ee5b6bacfdcb2ca43fddb/index.html",
+      "checkedAt": "2026-11-12T03:31:31.078Z",
+      "latencyMs": 769
+    },
+    {
+      "url": "wss://crypto-college.cc/wisp/",
+      "source": "https://github.com/0800WebDev/zinc/blob/0809410d194fa0d980442e247f81b7ccea2fe0a4/script.js",
+      "checkedAt": "2026-11-12T03:31:31.081Z",
+      "latencyMs": 1072
+    },
+    {
+      "url": "wss://pgis-wisp.joytree.site/",
+      "source": "https://github.com/0800WebDev/zinc/blob/0809410d194fa0d980442e247f81b7ccea2fe0a4/internal/about.html",
+      "checkedAt": "2026-11-12T03:31:31.096Z",
+      "latencyMs": 945
+    },
+    {
+      "url": "wss://info.hotelsunrisegrand.com/wisp/",
+      "source": "https://github.com/0800WebDev/zinc/blob/0809410d194fa0d980442e247f81b7ccea2fe0a4/script.js",
+      "checkedAt": "2026-11-12T03:31:31.568Z",
+      "latencyMs": 1101
+    },
+    {
+      "url": "wss://us-east.wisp.q13x.com/",
+      "source": "https://github.com/Kitaylena/Citasune/blob/0c16f75f15d2906ea553b2f3ec4cf0a677c7b93a/scripts/main/main.js",
+      "checkedAt": "2026-11-12T03:31:31.625Z",
+      "latencyMs": 546
+    },
+    {
+      "url": "wss://linuxontab-net.fly.dev/wisp",
+      "source": "https://github.com/PsychoSmiley/NPCAgent/blob/2dda7165ce9d60f58e1ee5b6bacfdcb2ca43fddb/index.html",
+      "checkedAt": "2026-11-12T03:31:31.689Z",
+      "latencyMs": 607
+    },
+    {
+      "url": "wss://tinf0il.site/wisp/",
+      "source": "https://github.com/PsychoSmiley/NPCAgent/blob/2dda7165ce9d60f58e1ee5b6bacfdcb2ca43fddb/index.html",
+      "checkedAt": "2026-11-12T03:31:32.124Z",
+      "latencyMs": 498
+    },
+    {
+      "url": "wss://shasta-lite.vercel.app/wisp/",
+      "source": "https://github.com/dazacode/shasta/blob/b2abe5bbb22401e75c6637a565dc22bcf181a8e3/scripts/lib/liteBuild.ts",
+      "checkedAt": "2026-11-12T03:31:32.231Z",
+      "latencyMs": 1134
+    },
+    {
+      "url": "wss://voiceless-dorry-nothinggames-cd908596.koyeb.app/",
+      "source": "https://github.com/asxrow66/frontend-pages/blob/6f3748e1493d0fa66a001a96aa576db98e05e8fc/public/index.html",
+      "checkedAt": "2026-11-12T03:31:32.300Z",
+      "latencyMs": 610
+    },
+    {
+      "url": "wss://wisp.webmc.fun/",
+      "source": "https://github.com/wl-unblock/MIN-wlyt-Plus/blob/615bd2165d357baa0e55c3c18126c2603781ae6c/proxy/embed.html",
+      "checkedAt": "2026-11-12T03:31:32.340Z",
+      "latencyMs": 771
+    },
+    {
+      "url": "wss://athollcottage.com/connection/",
+      "source": "https://github.com/unblockedgames99x-code/neo-os-core-cdn/blob/a7ba1cab8b175b7ab0376b1eca098c386d43669f/neo-local-config.js",
+      "checkedAt": "2026-11-12T03:31:32.790Z",
+      "latencyMs": 449
+    },
+    {
+      "url": "wss://phantom.lol/wisp/",
+      "source": "https://github.com/verdjs/Verdi/blob/519e034c460a3e78e57bf0aab6c38c562686c174/pages/settings.html",
+      "checkedAt": "2026-11-12T03:31:32.937Z",
+      "latencyMs": 812
+    },
+    {
+      "url": "wss://budsin-wisp.onrender.com/wisp/",
+      "source": "https://github.com/Juanjo3222/budsin-games-web/blob/849c0bf7be66c192ea81c8e92fcd41d26da333a3/public/proxy/index.html",
+      "checkedAt": "2026-11-12T03:31:32.991Z",
+      "latencyMs": 760
+    },
+    {
+      "url": "wss://fulcrumtheatreinc.com/wisp/",
+      "source": "https://github.com/0800WebDev/zinc/blob/0809410d194fa0d980442e247f81b7ccea2fe0a4/script.js",
+      "checkedAt": "2026-11-12T03:31:33.214Z",
+      "latencyMs": 913
+    },
+    {
+      "url": "wss://kristenblackburnvolleyballcamps.com/socket/",
+      "source": "https://github.com/unblockedgames99x-code/neo-os-core-cdn/blob/a7ba1cab8b175b7ab0376b1eca098c386d43669f/neo-local-config.js",
+      "checkedAt": "2026-11-12T03:31:33.574Z",
+      "latencyMs": 636
+    },
+    {
+      "url": "wss://tungtung.best/wisp/",
+      "source": "https://github.com/0800WebDev/zinc/blob/0809410d194fa0d980442e247f81b7ccea2fe0a4/script.js",
+      "checkedAt": "2026-11-12T03:31:33.756Z",
+      "latencyMs": 965
+    },
+    {
+      "url": "wss://info.shop1stoponline.com/wisp/",
+      "source": "https://github.com/0800WebDev/zinc/blob/0809410d194fa0d980442e247f81b7ccea2fe0a4/script.js",
+      "checkedAt": "2026-11-12T03:31:33.967Z",
+      "latencyMs": 975
+    },
+    {
+      "url": "wss://civil.quartinal.me/wisp/",
+      "source": "https://github.com/PsychoSmiley/NPCAgent/blob/2dda7165ce9d60f58e1ee5b6bacfdcb2ca43fddb/index.html",
+      "checkedAt": "2026-11-12T03:31:34.627Z",
+      "latencyMs": 1412
+    },
+    {
+      "url": "wss://hurt-agata-liventcord-api-7072e9a6.koyeb.app/",
+      "source": "https://github.com/MaxGuill8882/abOS/blob/6c365127096bcbf54396333f1292c48a21078496/webos-desktop/public/sapps/set-template.html",
+      "checkedAt": "2026-11-12T03:31:34.665Z",
+      "latencyMs": 1090
+    },
+    {
+      "url": "wss://edushasta.lol/wisp/",
+      "source": "https://github.com/dazacode/shasta/blob/b2abe5bbb22401e75c6637a565dc22bcf181a8e3/scripts/lib/liteBuild.ts",
+      "checkedAt": "2026-11-12T03:31:35.259Z",
+      "latencyMs": 1502
+    },
+    {
+      "url": "wss://bestspark.org/wisp/",
+      "source": "https://github.com/whosrogo/svgtest/blob/5bf3aee35c1e3432a0982800f6db4c3b21993be7/proxy-single.svg",
+      "checkedAt": "2026-11-12T03:31:35.373Z",
+      "latencyMs": 746
+    },
+    {
+      "url": "wss://mex-ubg-wisp.onrender.com/wisp/",
+      "source": "https://github.com/thehambugermanreal/mex/blob/841ae99c155d0dcbd3a63dae25ee03836b1915a3/public/embed.html",
+      "checkedAt": "2026-11-12T03:31:35.401Z",
+      "latencyMs": 1433
+    },
+    {
+      "url": "wss://studyhub.colegioitalocomposto.cl/wisp/",
+      "source": "https://github.com/0800WebDev/zinc/blob/0809410d194fa0d980442e247f81b7ccea2fe0a4/script.js",
+      "checkedAt": "2026-11-12T03:31:35.790Z",
+      "latencyMs": 1124
+    },
+    {
+      "url": "wss://studyhub.kkmsilvia.com/wisp/",
+      "source": "https://github.com/0800WebDev/zinc/blob/0809410d194fa0d980442e247f81b7ccea2fe0a4/script.js",
+      "checkedAt": "2026-11-12T03:31:36.928Z",
+      "latencyMs": 1554
+    },
+    {
+      "url": "wss://tokyo.new-updates.info/wisp/",
+      "source": "https://github.com/smartfoloo/arsenic/blob/ad0c9be6c5035137b0a43e5e5373bb9690a5c698/src/lib/backends.js",
+      "checkedAt": "2026-11-12T03:31:36.959Z",
+      "latencyMs": 1555
+    },
+    {
+      "url": "wss://browserjs-production.up.railway.app/wisp/",
+      "source": "https://github.com/btwiuse/gear-browser/blob/f11a64e4720a12872757233a6467d3ed7f94fc68/README.md",
+      "checkedAt": "2026-11-12T03:31:37.381Z",
+      "latencyMs": 2121
+    },
+    {
+      "url": "wss://studyworkandmore.uk/wisp/",
+      "source": "https://github.com/PsychoSmiley/NPCAgent/blob/2dda7165ce9d60f58e1ee5b6bacfdcb2ca43fddb/index.html",
+      "checkedAt": "2026-11-12T03:31:37.727Z",
+      "latencyMs": 798
+    },
+    {
+      "url": "wss://studyhub.asirargentina.com.ar/wisp/",
+      "source": "https://github.com/0800WebDev/zinc/blob/0809410d194fa0d980442e247f81b7ccea2fe0a4/script.js",
+      "checkedAt": "2026-11-12T03:31:38.887Z",
+      "latencyMs": 1505
+    },
+    {
+      "url": "wss://triplet.bumon.ar/wisp/",
+      "source": "https://github.com/0800WebDev/zinc/blob/0809410d194fa0d980442e247f81b7ccea2fe0a4/script.js",
+      "checkedAt": "2026-11-12T03:31:38.943Z",
+      "latencyMs": 1215
+    },
+    {
+      "url": "wss://pgis-wisp.getvoroa.com/",
+      "source": "https://github.com/0800WebDev/zinc/blob/0809410d194fa0d980442e247f81b7ccea2fe0a4/script.js",
+      "checkedAt": "2026-11-12T03:31:39.109Z",
+      "latencyMs": 2149
+    }
+  ]
+}

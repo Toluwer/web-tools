@@ -1,0 +1,20 @@
+{
+  "name": "webtool",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/build-ui.mjs",
+    "vendor:office": "node scripts/vendor-office.mjs",
+    "test:ui": "node scripts/check-ui.cjs && node scripts/check-ui-states.cjs && node scripts/check-workspaces.cjs",
+    "audit:wisps": "node scripts/verify-wisps.cjs"
+  },
+  "devDependencies": {
+    "@office-kit/pptx": "0.28.0",
+    "@office-kit/pptx-preview": "0.21.0",
+    "docx-preview": "0.4.1",
+    "esbuild": "0.25.12",
+    "jszip": "3.10.1",
+    "playwright": "1.62.1",
+    "pptxgenjs": "4.0.1",
+    "ws": "8.18.3"
+  }
+}
