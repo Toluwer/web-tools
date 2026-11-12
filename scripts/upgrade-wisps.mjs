@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import {writeGenerated} from './write-generated.mjs';
 const read=p=>fs.readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const audit=JSON.parse(read('data/wisps.json'));
 if(audit.additional<46||audit.servers.length<46)throw Error('The requested additional verified endpoints are missing.');
@@ -19,4 +20,4 @@ if(!html.includes('/* bounded relay audit */')){
 
 `+html.slice(end);
 }
-fs.writeFileSync(new URL('../GUST.html',import.meta.url),html);
+writeGenerated(new URL('../GUST.html',import.meta.url),html);

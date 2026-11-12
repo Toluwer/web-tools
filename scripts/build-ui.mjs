@@ -1,10 +1,11 @@
-import {readFileSync, writeFileSync} from 'node:fs';
+import {readFileSync} from 'node:fs';
+import {writeGenerated} from './write-generated.mjs';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const read=p=>readFileSync(path.join(root,p),'utf8').replace(/\r\n/g,'\n');
-const write=(p,text)=>writeFileSync(path.join(root,p),text.replace(/\r\n/g,'\n'));
+const write=(p,text)=>writeGenerated(path.join(root,p),text.replace(/\r\n/g,'\n'));
 const loading=read('ui/loading.css');
 let html=read('WebTool.html');
 const style='<style id="webtool-design">\n'+read('ui/webtool.css')+'\n</style>';
@@ -89,6 +90,7 @@ loader=loader.replace('content="#000000"','content="#141414"');
 loader=loader.replace('<div id="fail"><div><b>All routes failed</b>every host unreachable</div></div>','<div id="fail"><div><b>Unable to load Webtool</b><span>The available hosts could not be reached. Check your connection, then try again.</span><br><button id="retry" type="button">Try again</button></div></div>');
 if(!loader.includes('getElementById("retry").addEventListener'))loader=loader.replace('  ladder();','  document.getElementById("retry").addEventListener("click", ladder);\n  ladder();');
 write('loader.html',loader);
-console.log('Embedded Webtool and browser designs, and rebuilt the navigation shell.');
 await import('./upgrade-workspaces.mjs?build='+Date.now());
 await import('./upgrade-wisps.mjs?build='+Date.now());
+
+console.log('Embedded Webtool and browser designs, and rebuilt the navigation shell.');

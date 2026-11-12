@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import {writeGenerated} from './write-generated.mjs';
 const p=new URL('../WebTool.html',import.meta.url);
 let html=fs.readFileSync(p,'utf8');
 // Remove the retired preset-only Office instructions from both provider lanes.
@@ -13,20 +14,13 @@ html=html.replace('})).slice(0, 1400) }); /* v83', '})).slice(0, tc.name === "re
 html=html.replace('})).slice(0, 1400) }); /* v83', '})).slice(0, j.tool === "read_document" ? 60000 : 1400) }); /* v83');
 
 const read=name=>fs.readFileSync(new URL('../'+name,import.meta.url),'utf8');
-const bridge=`  AI_TOOLS.create_document.run = function(args){return window.WTOffice.createDocument(args);};
-  AI_TOOLS.create_presentation.run = function(args){return window.WTOffice.createPresentation(args);};
-  AI_TOOLS.list_documents = {run:function(){return {files:window.WTOffice.list()};}};
-  AI_TOOLS.read_document = {run:function(args){return window.WTOffice.read(args.id);}};
-  AI_FN_TOOLS.forEach(function(t){if(t.function.name==="create_presentation")t.function.description="Create an editable PowerPoint file from independently positioned text, shapes, images, charts, and tables, with custom canvas dimensions and speaker notes. Open in Documents or download. No preset-only or fixed slide-count restriction.";if(t.function.name==="create_document")t.function.description="Create a rich Word document with paged preview, headings, rich runs, tables, lists, images, headers, footers, footnotes, and page numbers.";});
-  var originalAiSystem = aiSysFor;
-  aiSysFor = function(){return originalAiSystem()+window.WTOffice.prompt;};
-  AI_FN_TOOLS.forEach(function(t){if(t.function.name === "create_presentation")t.function.parameters={type:"object",properties:{title:{type:"string"},width:{type:"number"},height:{type:"number"},slides:{type:"array",items:{type:"object",properties:{background:{type:"string"},notes:{type:"string"},elements:{type:"array",items:{type:"object",additionalProperties:true}}},additionalProperties:true}}},required:["title","slides"],additionalProperties:true};if(t.function.name === "create_document")t.function.parameters={type:"object",properties:{title:{type:"string"},blocks:{type:"array",items:{type:"object",additionalProperties:true}}},required:["title","blocks"],additionalProperties:true};});
-  AI_FN_TOOLS.push({type:"function",function:{name:"list_documents",description:"List files in the local Documents workspace",parameters:{type:"object",properties:{}}}},{type:"function",function:{name:"read_document",description:"Read the source model or text of a local document for revision",parameters:{type:"object",properties:{id:{type:"string"}},required:["id"]}}});
-  aiBuild();`;
-const vendor=['jszip.min.js','docx-preview.min.js','pptxgen.bundle.js','slides.min.js'];
+const bridge=read('ui/ai-bridge.js').trimEnd();
+const vendor=['jszip.min.js','docx-preview.min.js','pptxgen.bundle.js','slides.min.js','word.min.js','readability.min.js'];
 let deps='<!-- workspace-engines:start -->\n';
 for(const file of vendor)deps+='<script>\n'+read('ui/vendor/'+file).replace(/<\/script/gi,'<\\/script')+'\n</script>\n';
-deps+='<script>\n'+read('ui/icons.js')+'\n'+read('ui/office.js')+'\n</script>\n<!-- workspace-engines:end -->\n';
+const credits=JSON.parse(read('ui/weather/credits.json'));const photos=Object.fromEntries(credits.photos.map(p=>[p.name,{author:p.author,page:p.page,data:'data:image/jpeg;base64,'+fs.readFileSync(new URL('../ui/weather/'+p.name+'.jpg',import.meta.url)).toString('base64')}]));
+const sources=['ui/icons.js','ui/media.js','ui/pagination.js','ui/office-schema.js','ui/presentation.js','ui/weather.js','ui/reader.js','ui/research.js','ui/office.js','ui/office-editor.js'];
+deps+='<script>\n'+sources.map(p=>{let code=read(p);if(p==='ui/weather.js')code=code.replace('/* WEATHER_PHOTOS */{}',JSON.stringify(photos));if(p==='ui/reader.js')code=code.replace("/* READER_FRAME */''",JSON.stringify(read('ui/vendor/reader-transport.html'))).replace('/* READER_RELAYS */[]',JSON.stringify(JSON.parse(read('data/wisps.json')).servers.map(s=>s.url)));return code.replace(/<\/script/gi,'<\\/script');}).join('\n')+'\n</script>\n<!-- workspace-engines:end -->\n';
 html=html.replace(/<!-- workspace-engines:start -->[\s\S]*?<!-- workspace-engines:end -->\s*/,'');
 html=html.replace('<script>',()=>deps+'<script>');
 if(!html.includes('/* full AI workspace */')){
@@ -46,7 +40,23 @@ if(!html.includes('/* full AI workspace */')){
  html=html.replace('  aiBuild();',bridge);
 }
 html=html.replace(/  AI_TOOLS\.create_document\.run = function\(args\)[\s\S]*?  aiBuild\(\);/,()=>bridge);
-const css=read('ui/workspaces.css');
+html=html.replace(/  aiBuild\(\);\n{2,}/,'  aiBuild();\n\n');
+
+// Retire the SVG weather scene implementation and route cards through photography.
+const wxStart=html.indexOf('  function aiWxGroup('),wxEnd=html.indexOf('  /* ---------- v83: artifact cards',wxStart);
+if(wxStart>=0&&wxEnd>=0)html=html.slice(0,wxStart)+'  function aiWxCard(card){return window.WTWeather.render(card); }\n\n'+html.slice(wxEnd);
+html=html.replace(/\["aiWorkspace", "documentsWorkspace"\]/g,'["aiWorkspace", "documentsWorkspace", "researchWorkspace"]');
+html=html.replace('id==="aiWorkspace"?name!=="ai":name!=="documents"','id==="aiWorkspace"?name!=="ai":id==="documentsWorkspace"?name!=="documents":name!=="research"');
+html=html.replace('ai: "choiceAI", documents: "choiceDocuments" };','ai: "choiceAI", documents: "choiceDocuments", research: "choiceResearch" };');
+if(!html.includes('compose: function(prompt,send)'))html=html.replace('open: aiOpen,', 'compose: function(prompt,send){aiOpen();aiIn.value=prompt;aiIn.focus();window.WTContextRefresh?.();if(send)aiSendB.click();},\n    open: aiOpen,');
+html=html.replace(/    showView\("ai"\);(?:\n    window.WTContextRefresh\?\.\(\);)*/,'    showView("ai");\n    window.WTContextRefresh?.();');
+html=html.replace('Use at most 5 tool calls per question','Use at most 12 tool calls per question').replace(/at most 5 calls per question/g,'at most 12 calls per question').replace(/calls >= 5/g,'calls >= 12');
+html=html.replace('if (calls >= 12) break;', 'if (calls >= 12) return {text:"The current research step limit is reached. Your sources and files are saved; ask me to continue if more work is needed.",calls:calls};');
+html=html.replace('/create_document|create_presentation/.test(name) ? 180000 : 12000','/create_document|create_presentation|edit_document/.test(name) ? 180000 : /research_|weather/.test(name) ? 60000 : 12000');
+html=html.replace(/\/\^TOOL RESULT read_document:\//g,'/\x5eTOOL RESULT (read_document|research_read_source):/');
+html=html.replace('tc.name === "read_document" ? 60000 : 1400','/read_document|research_read_source/.test(tc.name) ? 60000 : tc.name === "research_search" ? 10000 : 4000').replace('j.tool === "read_document" ? 60000 : 1400','/read_document|research_read_source/.test(j.tool) ? 60000 : j.tool === "research_search" ? 10000 : 4000');
+
+const css=['ui/workspaces.css','ui/research.css','ui/weather.css'].map(read).join('\n');
 html=html.replace(/<style id="office-design">[\s\S]*?<\/style>\s*/,'');
 html=html.replace('</head>','<style id="office-design">\n'+css+'\n</style>\n</head>');
-fs.writeFileSync(p,html.replace(/\r\n/g,'\n'));
+writeGenerated(p,html.replace(/\r\n/g,'\n'));

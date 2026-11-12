@@ -4,12 +4,15 @@
   "scripts": {
     "build": "node scripts/build-ui.mjs",
     "vendor:office": "node scripts/vendor-office.mjs",
-    "test:ui": "node scripts/check-ui.cjs && node scripts/check-ui-states.cjs && node scripts/check-workspaces.cjs",
+    "test:ui": "node scripts/check-ui.cjs && node scripts/check-ui-states.cjs && node scripts/check-workspaces.cjs && node scripts/check-expansion.cjs",
     "audit:wisps": "node scripts/verify-wisps.cjs"
   },
   "devDependencies": {
+    "@mozilla/readability": "0.6.0",
     "@office-kit/pptx": "0.28.0",
     "@office-kit/pptx-preview": "0.21.0",
+    "buffer": "6.0.3",
+    "docx": "9.5.1",
     "docx-preview": "0.4.1",
     "esbuild": "0.25.12",
     "jszip": "3.10.1",
