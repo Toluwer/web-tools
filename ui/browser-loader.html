@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#141414">
+<title>Webtool browser</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;color-scheme:dark}
+body{background:#141414;color:#f3f3f3;font:13px/1.6 'Segoe UI',Arial,sans-serif;overflow:hidden}
+#wrap,#fail{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:28px;background:#181818;text-align:center}
+#ttl{font-size:23px;font-weight:600;letter-spacing:-.6px;color:#f3f3f3}
+#sub,#fail span{font-size:13px;color:#969696;max-width:460px;line-height:1.8}
+#sub b{color:#b5b5b5;font-weight:500}
+#bar{width:300px;max-width:80vw;height:3px;background:#303030;border-radius:4px;overflow:hidden}
+#fill{height:100%;width:0;background:#3b82f6;border-radius:4px;transition:width .25s}
+#cred{font-size:11px;color:#777}#cred a{color:#969696;text-underline-offset:3px}
+#fail{display:none}#fail>div{width:min(420px,100%);padding:30px;border:1px solid #303030;border-radius:20px;background:#232323}
+#fail b{display:block;font-size:21px;font-weight:550;color:#f3f3f3;margin-bottom:10px}
+#retry{font:600 12px 'Segoe UI',Arial,sans-serif;padding:10px 18px;background:#3b82f6;color:#fff;border:0;border-radius:999px;cursor:pointer;margin-top:8px}
+#retry:hover{background:#4d8df7}#retry:focus-visible,a:focus-visible{outline:2px solid #3b82f6;outline-offset:4px}
+#frame{position:fixed;inset:0;width:100%;height:100%;border:0;background:#181818;display:none}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="ttl">Opening the browser</div>
+  <div id="bar"><div id="fill"></div></div>
+  <div id="sub">loading GUST from <b id="route">&hellip;</b><br><span id="bytes"></span></div>
+  <div id="cred">GUST by <a href="https://github.com/nautilus-os/GUST" target="_blank" rel="noopener">Nautilus Labs</a></div>
+</div>
+<div id="fail">
+  <b>All routes failed</b>
+  <span id="failnote">every host unreachable</span>
+  <button id="retry" type="button">Try again</button>
+</div>
+<iframe id="frame" title="browser" referrerpolicy="no-referrer" allow="fullscreen; autoplay; clipboard-read; clipboard-write; encrypted-media; display-capture; downloads"></iframe>
+<script>
+(function () {
+  "use strict";
+  var ROUTES = /*__ROUTES__*/[];
+  var EST = 3984952;
+  var wrap = document.getElementById("wrap");
+  var fill = document.getElementById("fill");
+  var routeEl = document.getElementById("route");
+  var bytesEl = document.getElementById("bytes");
+  var failEl = document.getElementById("fail");
+  var frame = document.getElementById("frame");
+  var retry = document.getElementById("retry");
+  var run = 0;
+
+  function bust(u) { return u + (u.indexOf("?") < 0 ? "?" : "&") + "v=" + run; }
+  function fmt(n) {
+    if (n >= 1048576) return (n / 1048576).toFixed(1) + " MB";
+    if (n >= 1024) return (n / 1024).toFixed(0) + " KB";
+    return n + " B";
+  }
+
+  function fetchGust(url, ms) {
+    return new Promise(function (resolve, reject) {
+      var ctl = new AbortController();
+      var timer = setTimeout(function () { ctl.abort(); }, ms);
+      fetch(url, { signal: ctl.signal, cache: "no-store" })
+        .then(function (r) {
+          if (!r.ok) throw new Error("HTTP " + r.status);
+          var total = parseInt(r.headers.get("content-length") || "0", 10) || 0;
+          var got = 0;
+          var chunks = [];
+          var reader = r.body.getReader();
+          function pump() {
+            return reader.read().then(function (x) {
+              if (x.done) return;
+              got += x.value.length;
+              chunks.push(x.value);
+              fill.style.width = (total ? Math.min(100, got / total * 100) : Math.min(95, got / EST * 100)).toFixed(1) + "%";
+              bytesEl.textContent = fmt(got) + (total ? " of " + fmt(total) : "");
+              return pump();
+            });
+          }
+          return pump().then(function () {
+            var size = 0, i;
+            for (i = 0; i < chunks.length; i++) size += chunks[i].length;
+            var all = new Uint8Array(size), at = 0;
+            for (i = 0; i < chunks.length; i++) { all.set(chunks[i], at); at += chunks[i].length; }
+            var txt = new TextDecoder("utf-8").decode(all);
+            if (txt.length < 500000 || txt.toLowerCase().indexOf("<!doctype html") !== 0) throw new Error("bad payload");
+            clearTimeout(timer);
+            resolve(txt);
+          });
+        })
+        .catch(function (e) { clearTimeout(timer); reject(e); });
+    });
+  }
+
+  function ladder() {
+    run = Date.now();
+    wrap.style.display = "flex";
+    failEl.style.display = "none";
+    frame.style.display = "none";
+    frame.removeAttribute("srcdoc");
+    var names = ["raw", "cdn", "pages"];
+    var i = 0;
+    (function step() {
+      if (i >= ROUTES.length) {
+        wrap.style.display = "none";
+        failEl.style.display = "flex";
+        return;
+      }
+      var u = ROUTES[i];
+      routeEl.textContent = names[i] || u;
+      bytesEl.textContent = "";
+      fill.style.width = "0";
+      fetchGust(bust(u), 45000).then(function (txt) {
+        frame.srcdoc = txt;
+        frame.style.display = "block";
+        wrap.style.display = "none";
+      })["catch"](function (e) {
+        bytesEl.textContent = (names[i] || "") + " failed (" + e.message + ")";
+        i++;
+        step();
+      });
+    })();
+  }
+
+  retry.addEventListener("click", ladder);
+  ladder();
+})();
+</script>
+</body>
+</html>

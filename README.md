@@ -18,3 +18,9 @@ Bookmark one of these:
 - **Browse the web**: a full browser through a proxy
 
 Movie data comes from [TMDB](https://www.themoviedb.org). The browser is [GUST](https://github.com/nautilus-os/GUST) (AGPLv3).
+
+## Interface development
+
+The interface has a persistent workspace sidebar, compact icon navigation, dark neutral surfaces, and blue primary actions. Every tool shares the same controls, spacing, dialogs, and responsive behavior.
+
+Edit the presentation sources under [`ui/`](ui/README.md), then run `node scripts/build-ui.mjs` to rebuild the self-contained HTML. See that guide for the palette and browser verification commands.
