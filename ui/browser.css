@@ -48,6 +48,12 @@ main { display:flex; flex:1; min-height:0; position:relative; border:1px solid v
 @media(max-width:700px) { .app { padding:0; } .titlebar { padding:8px 5px; gap:5px; } .brand { min-width:0; font-size:12px; padding:5px; } .brand span { display:none; } .tab { width:140px; min-width:100px; } .navbar { padding:9px; border-radius:0; gap:5px; } .tool-toggle span,.engine-select,.navbar .toolbar-actions { display:none; } .omnibox { min-width:60px; padding:1px 7px; } .omnibox-actions { gap:0; } .nav-pill-btn,.nav-btn,.omni-btn,.tool-btn { width:26px; } .nt-content { padding:40px 22px 100px; justify-content:flex-start; } .nt-header { margin:12px 0 30px; } .nt-brand { font-size:25px; } .nt-search { padding:10px; gap:5px; } .nt-search-engine { font-size:10px; gap:4px; } .nt-favorites { gap:8px; } .nt-fav-box { min-width:70px; padding:10px; } .logs,.elements,.ai-sidebar { position:absolute; inset:0 0 0 auto; width:95vw; z-index:1000; } .find-bar { width:calc(100% - 20px); right:10px; } .settings-section { padding:24px 18px; } .settings-card-body { padding:18px; } }
 @media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none !important; transition:none !important; } }
 @media(max-width:700px) {
+  .navbar { flex-wrap:wrap; gap:8px; }
+  .omnibox { flex-basis:calc(100% - 190px); min-width:150px; }
+  .navbar > .tool-btn,.navbar > .tool-toggle { flex:none; }
+  .navbar .toolbar-actions { display:flex; }
+  .omnibox .omnibox-actions { flex-shrink:0; }
+  .omnibox .url-input { min-width:0; width:0; }
   .browser-settings-layout { flex-direction:column; }
   .browser-settings-sidebar { width:100%; min-width:0; height:58px; flex:none; border-right:0; border-bottom:1px solid var(--bd); padding:8px 0; overflow-x:auto; }
   .browser-settings-sidebar nav { flex-direction:row!important; width:max-content; padding:0 12px!important; }

@@ -91,6 +91,11 @@ const cover='<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600"><r
   await browserPage.screenshot({path:path.join(output,'browser-settings.png')});
   await browserPage.locator('.settings-nav-item[data-section="appearance"]').click();
   await browserPage.screenshot({path:path.join(output,'browser-appearance.png')});
+  await browserPage.setViewportSize({width:390,height:844});
+  assert.equal(await browserPage.locator('.navbar').evaluate(n=>n.scrollWidth<=n.clientWidth+2),true,'Browser toolbar fits phone width');
+  await browserPage.locator('.settings-nav-item[data-section="appearance"]').click();
+  assert.equal(await browserPage.locator('.browser-settings-content').evaluate(n=>n.scrollWidth<=n.clientWidth+2),true,'Browser settings fit phone width');
+  await browserPage.screenshot({path:path.join(output,'browser-settings-mobile.png')});
   assert.deepEqual(errors,[]);
   console.log(JSON.stringify({passed:true,checked:'Movie search/detail, six school tabs, account mode, AI code/artifacts/downloads, mobile filters, browser home/settings',errors},null,2));
   await browser.close();
