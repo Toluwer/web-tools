@@ -13,8 +13,8 @@ Bookmark one of these:
 - **Link Tester**: checks any URL
 - **Movies**: browse and watch movies and shows
 - **Brookwood Hub**: school events, news, and bell schedule; the days-off countdown clicks between total days, business days, and weeks + days
-- **Chat**: chat room with accounts and DMs; shared files auto-delete one hour after they are sent (each file card counts down)
-- **WebTool AI**: an assistant on every screen that answers questions, does math, shows the weather, writes code, and builds real .pptx and .docx files
+- **Chat**: chat room with accounts and DMs; durable device history and conflict-aware account synchronization; file cards remain in history, while temporary hosting links expire on their provider’s schedule
+- **WebTool AI**: a dedicated assistant workspace that answers questions, does math, shows the weather, writes code, and builds editable .pptx and .docx files using saved native source projects and rendered-page review
 - **Browse the web**: a full browser through a proxy
 
 Movie data comes from [TMDB](https://www.themoviedb.org). The browser is [GUST](https://github.com/nautilus-os/GUST) (AGPLv3).

@@ -56,7 +56,7 @@
   var sideNav=node('nav','sidebar-navigation');sideNav.setAttribute('aria-label','Workspaces');
   [{id:'choiceHome',name:'All tools'}].concat(tools).forEach(function(t){var b=node('button','sidebar-workspace');b.type='button';b.dataset.navigate=t.id;b.innerHTML=$(t.id).querySelector('svg').outerHTML+'<span>'+t.name+'</span>';b.addEventListener('click',function(){openTool(t.id);});sideNav.appendChild(b);});
   globalSide.appendChild(sideNav);
-  var detailSlot=node('div','sidebar-detail');globalSide.appendChild(detailSlot);globalSide.appendChild(node('p','sidebar-footer','Everything in one place.'));
+  var detailSlot=node('div','sidebar-detail');globalSide.appendChild(detailSlot);
   document.body.appendChild(globalSide);
   var mobileContext=node('div','mobile-context');$('workspace').prepend(mobileContext);
   var contextMedia=window.matchMedia('(max-width:640px)'),currentView='start';

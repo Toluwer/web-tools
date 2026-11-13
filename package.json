@@ -4,7 +4,7 @@
   "scripts": {
     "build": "node scripts/build-ui.mjs",
     "vendor:office": "node scripts/vendor-office.mjs",
-    "test:ui": "node scripts/check-ui.cjs && node scripts/check-ui-states.cjs && node scripts/check-workspaces.cjs && node scripts/check-expansion.cjs",
+    "test:ui": "node scripts/check-ui.cjs && node scripts/check-ui-states.cjs && node scripts/check-workspaces.cjs && node scripts/check-expansion.cjs && node scripts/check-generation.cjs && node scripts/check-chat-sync.cjs",
     "audit:wisps": "node scripts/verify-wisps.cjs"
   },
   "devDependencies": {
@@ -15,6 +15,7 @@
     "docx": "9.5.1",
     "docx-preview": "0.4.1",
     "esbuild": "0.25.12",
+    "html2canvas": "1.4.1",
     "jszip": "3.10.1",
     "playwright": "1.62.1",
     "pptxgenjs": "4.0.1",

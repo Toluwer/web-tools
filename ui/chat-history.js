@@ -1,0 +1,9 @@
+/* Durable device archive and deterministic identity-based reconciliation. */
+(function(){
+ let dbp;const db=()=>dbp||(dbp=new Promise((resolve,reject)=>{const q=indexedDB.open('webtool-chat-history',1);q.onupgradeneeded=()=>q.result.createObjectStore('accounts',{keyPath:'name'});q.onsuccess=()=>resolve(q.result);q.onerror=()=>reject(q.error);}));
+ function entry(a,b){if(!a)return structuredClone(b);if(!b)return structuredClone(a);if(a.deleted||b.deleted){const d=a.deleted?a:b;return {...d,x:'',img:'',f:null,deleted:true};}const stamp=e=>Math.max(+e.updated||0,+e.ed||0,+e.ts||0),sa=stamp(a),sb=stamp(b);const first=sa!==sb?(sa>sb?a:b):(JSON.stringify(a)<JSON.stringify(b)?a:b),second=first===a?b:a;return {...second,...first,img:first.img||second.img||'',f:first.f||second.f||null};}
+ function merge(primary,others,name){const by=new Map();for(const e of [...(primary||[]),...(others||[]).flatMap(p=>p?.log||[])])if(e?.i)by.set(e.i,entry(by.get(e.i),e));return [...by.values()].map(e=>({...e,m:e.w===name?1:0})).sort((a,b)=>(a.ts||0)-(b.ts||0)||a.i.localeCompare(b.i));}
+ async function read(name){const d=await db();return new Promise((resolve,reject)=>{const q=d.transaction('accounts').objectStore('accounts').get(name);q.onsuccess=()=>resolve(q.result);q.onerror=()=>reject(q.error);});}
+ async function save(profile){const d=await db();return new Promise((resolve,reject)=>{const t=d.transaction('accounts','readwrite'),store=t.objectStore('accounts'),q=store.get(profile.name);q.onsuccess=()=>{const old=q.result;if(old&&(old.wg||0)>(profile.wg||0)){resolve(old);return;}const log=old&&(old.wg||0)===(profile.wg||0)?merge(profile.log,[old],profile.name):profile.log;store.put({name:profile.name,wg:profile.wg||0,log,updated:Date.now()});};t.oncomplete=()=>resolve(profile);t.onerror=()=>reject(t.error);});}
+ window.WTHistory={merge,read,save};
+})();

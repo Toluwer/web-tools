@@ -8,6 +8,7 @@ const read=p=>readFileSync(path.join(root,p),'utf8').replace(/\r\n/g,'\n');
 const write=(p,text)=>writeGenerated(path.join(root,p),text.replace(/\r\n/g,'\n'));
 const loading=read('ui/loading.css');
 let html=read('WebTool.html');
+html=html.replace(/<!-- generation-engine:start -->[\s\S]*?<!-- generation-engine:end -->\s*/,'');
 const style='<style id="webtool-design">\n'+read('ui/webtool.css')+'\n</style>';
 html=html.replace(/<style(?: id="webtool-design")?>[\s\S]*?<\/style>/,style);
 html=html.replace(/<meta name="theme-color" content="[^"]*">/,'<meta name="theme-color" content="#131313">');
@@ -92,5 +93,6 @@ if(!loader.includes('getElementById("retry").addEventListener'))loader=loader.re
 write('loader.html',loader);
 await import('./upgrade-workspaces.mjs?build='+Date.now());
 await import('./upgrade-wisps.mjs?build='+Date.now());
+await import('./upgrade-generation.mjs?build='+Date.now());
 
 console.log('Embedded Webtool and browser designs, and rebuilt the navigation shell.');

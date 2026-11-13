@@ -1,3 +1,5 @@
+import * as WordAPI from 'docx';
+export const api=WordAPI;
 import {
   Document,Packer,Paragraph,TextRun,Table,TableRow,TableCell,ImageRun,
   Header,Footer,PageNumber,PageBreak,ColumnBreak,Bookmark,InternalHyperlink,
