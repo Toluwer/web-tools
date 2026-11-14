@@ -80,7 +80,6 @@ body{background:#141414;color:#f3f3f3;font:13px/1.6 'Segoe UI',Arial,sans-serif;
     fail.style.display = "none";
     var steps = [
       { name: "raw",   run: function () { return fetchText(bust(RAW)).then(useSrcdoc); } },
-      { name: "cdn",   run: function () { return fetchText(bust(JSD)).then(useSrcdoc); } },
       { name: "pages", run: function () { return fetchText(bust(PG), 9000).then(function () { useSrc(bust(PG)); }); } },
       { name: "pages · direct", run: function () {
         return new Promise(function (resolve, reject) {
@@ -97,7 +96,8 @@ body{background:#141414;color:#f3f3f3;font:13px/1.6 'Segoe UI',Arial,sans-serif;
           frame.addEventListener("load", onLoad);
           useSrc(bust(PG));
         });
-      } }
+      } },
+      { name: "cdn",   run: function () { return fetchText(bust(JSD)).then(useSrcdoc); } }
     ];
     var i = 0;
     (function step() {

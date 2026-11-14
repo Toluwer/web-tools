@@ -5,7 +5,7 @@ Browser tools for school networks. Works on Lightspeed and Securly.
 Bookmark one of these:
 
 - https://Toluwer.github.io/web-tools/loader.html
-- https://cdn.jsdelivr.net/gh/Toluwer/web-tools@main/WebTool.svg (works when the first one is blocked)
+- https://toluwer.github.io/web-tools/WebTool.svg (works when the first one is blocked)
 
 ## Tools
 

@@ -6,17 +6,17 @@
     "use strict";
     var USER = "Toluwer", REPO = "web-tools", APP = "WebTool.html";
     var SOURCES = [
-      "https://cdn.jsdelivr.net/gh/" + USER + "/" + REPO + "@main/" + APP,
+      "https://" + USER + ".github.io/" + REPO + "/" + APP,
       "https://raw.githubusercontent.com/" + USER + "/" + REPO + "/main/" + APP,
       "https://fastly.jsdelivr.net/gh/" + USER + "/" + REPO + "@main/" + APP,
       "https://gcore.jsdelivr.net/gh/" + USER + "/" + REPO + "@main/" + APP,
-      "https://" + USER + ".github.io/" + REPO + "/" + APP
+      "https://cdn.jsdelivr.net/gh/" + USER + "/" + REPO + "@main/" + APP
     ];
     var LINKS = [
-      ["open via cdn.jsdelivr.net", SOURCES[0]],
+      ["open at home (github.io)", SOURCES[0]],
       ["open via raw.githubusercontent.com", SOURCES[1]],
       ["open via fastly.jsdelivr.net", SOURCES[2]],
-      ["open at home (github.io)", SOURCES[4]]
+      ["open via cdn.jsdelivr.net", SOURCES[4]]
     ];
     var svg = document.documentElement;
     var XSVG = "http://www.w3.org/2000/svg", XH = "http://www.w3.org/1999/xhtml";
